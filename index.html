@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infografía: La Imagen Digital</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!--
+        PALETTE: Cyber Vivid
+        Primary: #111827 (Gray 900)
+        Accent 1: #F43F5E (Rose 500) - Used for Bitmaps
+        Accent 2: #06B6D4 (Cyan 500) - Used for Vectors
+        Background: #F3F4F6 (Gray 100)
+        
+        PLAN NARRATIVE:
+        1. Intro: Digitalization concept (0s and 1s).
+        2. Comparison: Radar Chart showing the "Duel" between Raster and Vector attributes.
+        3. Formats: Bar chart comparing features of JPEG, PNG, GIF, SVG.
+        4. Resolution Logic: Scatter plot showing DPI vs File Size relationship.
+        5. Decision Tree: Practical application (Instagram vs Print).
+        
+        CHART JUSTIFICATIONS (NO SVG USED):
+        1. Radar Chart (Chart.js): Best for comparing multi-variable attributes (Scalability, Realism, etc.) of two distinct categories (Bitmap vs Vector).
+        2. Bar Chart (Chart.js): Comparing categorical features (Transparency, Animation) across file formats.
+        3. Scatter Plot (Chart.js): Showing the correlation between two quantitative variables (Resolution vs Size).
+        4. HTML/CSS Flowchart: Structured layout for decision logic without using Mermaid or SVG.
+        
+        CONFIRMATION: NEITHER Mermaid JS NOR SVG were used anywhere in this output.
+    -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+
+        @media (max-width: 640px) {
+            .chart-container {
+                height: 300px;
+            }
+        }
+
+        .pixel-grid {
+            background-image: linear-gradient(#e5e7eb 1px, transparent 1px),
+            linear-gradient(90deg, #e5e7eb 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        
+        .node-point {
+            width: 12px;
+            height: 12px;
+            background-color: #06B6D4;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 10px #06B6D4;
+        }
+
+        .pixel-block {
+            width: 12px;
+            height: 12px;
+            background-color: #F43F5E;
+            display: inline-block;
+            box-shadow: 0 0 0 1px #9f1239;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <nav class="bg-gray-900 text-white p-4 sticky top-0 z-50 shadow-lg">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold tracking-wider">IMAGEN<span class="text-cyan-400">DIGITAL</span></h1>
+            <div class="text-xs uppercase tracking-widest text-gray-400">4º ESO | Tecnologías</div>
+        </div>
+    </nav>
+
+    <header class="bg-gray-900 text-white py-16 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10 pixel-grid"></div>
+        <div class="max-w-4xl mx-auto px-6 relative z-10 text-center">
+            <h2 class="text-4xl md:text-6xl font-black mb-6 leading-tight">
+                El Mundo en <span class="text-rose-500">Píxeles</span> y <span class="text-cyan-400">Nodos</span>
+            </h2>
+            <p class="text-lg md:text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+                Una imagen digital es más que una foto. Es una matriz de datos binarios (0 y 1). 
+                Pero, ¿cómo guardamos esa información? Descubre la gran batalla entre Mapas de Bits y Vectores.
+            </p>
+            <div class="flex justify-center gap-4">
+                <div class="flex items-center gap-2 bg-gray-800 px-4 py-2 rounded-full border border-rose-500">
+                    <span class="pixel-block"></span>
+                    <span class="font-bold text-rose-400">Ráster (Mapa de Bits)</span>
+                </div>
+                <div class="flex items-center gap-2 bg-gray-800 px-4 py-2 rounded-full border border-cyan-400">
+                    <span class="node-point"></span>
+                    <span class="font-bold text-cyan-400">Vectorial</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-12 space-y-20">
+
+        <section id="comparison">
+            <div class="text-center mb-10">
+                <h3 class="text-3xl font-bold text-gray-900 mb-4">El Gran Duelo: Píxel vs. Nodo</h3>
+                <p class="text-gray-600 max-w-2xl mx-auto">
+                    No todos los formatos son iguales. Mientras los mapas de bits dominan la fotografía, los vectores son los reyes del diseño gráfico escalable. Analicemos sus fortalezas.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-rose-500 h-full">
+                    <h4 class="text-xl font-bold text-gray-800 mb-2">Mapa de Bits (Ráster)</h4>
+                    <ul class="space-y-2 text-sm text-gray-600 mb-4">
+                        <li class="flex items-center"><span class="mr-2 text-rose-500">■</span> Formado por rejilla de píxeles.</li>
+                        <li class="flex items-center"><span class="mr-2 text-rose-500">■</span> Al ampliar se "pixela" (pierde calidad).</li>
+                        <li class="flex items-center"><span class="mr-2 text-rose-500">■</span> Archivos pesados a alta resolución.</li>
+                    </ul>
+                    <div class="p-4 bg-gray-50 rounded text-center text-xs font-mono">
+                        ZOOM 500% = 👾 PIXELADO
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-cyan-500 h-full">
+                    <h4 class="text-xl font-bold text-gray-800 mb-2">Imagen Vectorial</h4>
+                    <ul class="space-y-2 text-sm text-gray-600 mb-4">
+                        <li class="flex items-center"><span class="mr-2 text-cyan-500">●</span> Formado por fórmulas matemáticas.</li>
+                        <li class="flex items-center"><span class="mr-2 text-cyan-500">●</span> Calidad infinita (escalable).</li>
+                        <li class="flex items-center"><span class="mr-2 text-cyan-500">●</span> Archivos muy ligeros.</li>
+                    </ul>
+                    <div class="p-4 bg-gray-50 rounded text-center text-xs font-mono">
+                        ZOOM 500% = 📐 PERFECTO
+                    </div>
+                </div>
+
+                <div class="md:col-span-2 bg-white rounded-xl shadow-lg p-6 mt-4">
+                    <h4 class="text-lg font-semibold text-center mb-6">Comparativa de Rendimiento</h4>
+                    <div class="chart-container">
+                        <canvas id="radarChart"></canvas>
+                    </div>
+                    <p class="text-center text-xs text-gray-400 mt-4">
+                        El gráfico muestra cómo los vectores ganan en escalabilidad y peso, mientras que los mapas de bits dominan en realismo fotográfico.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="formats">
+            <div class="text-center mb-10">
+                <h3 class="text-3xl font-bold text-gray-900 mb-4">Los Protagonistas: Formatos de Archivo</h3>
+                <p class="text-gray-600 max-w-2xl mx-auto">
+                    JPEG, PNG, GIF, SVG... ¿Cuál elegir? Cada extensión tiene superpoderes específicos. Aquí analizamos sus capacidades técnicas.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h4 class="text-lg font-semibold mb-4 text-rose-600">Formatos de Píxeles (Ráster)</h4>
+                    <div class="space-y-4">
+                        <div class="border-b pb-2">
+                            <strong class="text-lg">JPEG (.jpg)</strong>
+                            <p class="text-sm text-gray-600">El rey de la fotografía. Compresión alta (ligero) pero con pérdida de calidad. Sin transparencia.</p>
+                        </div>
+                        <div class="border-b pb-2">
+                            <strong class="text-lg">PNG (.png)</strong>
+                            <p class="text-sm text-gray-600">Calidad sin pérdida. Admite fondo transparente (canal alfa). Ideal para webs.</p>
+                        </div>
+                        <div>
+                            <strong class="text-lg">GIF (.gif)</strong>
+                            <p class="text-sm text-gray-600">Solo 256 colores. Soporta animaciones sencillas. El padre de los memes.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h4 class="text-lg font-semibold mb-4 text-cyan-600">Formatos Matemáticos (Vector)</h4>
+                    <div class="space-y-4">
+                        <div class="border-b pb-2">
+                            <strong class="text-lg">SVG (.svg)</strong>
+                            <p class="text-sm text-gray-600">Scalable Vector Graphics. Estándar web. Código legible por humanos. Animable con CSS.</p>
+                        </div>
+                        <div>
+                            <strong class="text-lg">AI / EPS</strong>
+                            <p class="text-sm text-gray-600">Formatos de edición profesional (Adobe Illustrator). Usados en imprenta y gigantografías.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="lg:col-span-2 bg-white rounded-xl shadow-lg p-6">
+                    <h4 class="text-lg font-semibold text-center mb-6">Puntuación de Capacidades Técnicas</h4>
+                    <div class="chart-container">
+                        <canvas id="barChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="resolution">
+            <div class="bg-gray-900 rounded-2xl p-8 md:p-12 text-white">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4 text-yellow-400">El Dilema de la Resolución</h3>
+                        <p class="text-gray-300 mb-6">
+                            En los mapas de bits, la calidad tiene un precio: el peso. La resolución se mide en PPI (Píxeles por Pulgada).
+                        </p>
+                        <ul class="space-y-3 mb-6">
+                            <li class="flex items-center gap-3">
+                                <span class="bg-yellow-400 text-gray-900 font-bold px-2 rounded">72 PPI</span>
+                                <span>Estándar para pantallas (Web/Móvil). Ligero.</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <span class="bg-rose-500 text-white font-bold px-2 rounded">300 PPI</span>
+                                <span>Estándar para impresión. Pesado y detallado.</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="bg-gray-800 rounded-xl p-4">
+                        <div class="chart-container">
+                            <canvas id="scatterChart"></canvas>
+                        </div>
+                        <p class="text-center text-xs text-gray-400 mt-2">Relación Tamaño de Archivo (MB) vs Resolución (PPI)</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="consultant-activity">
+            <div class="text-center mb-10">
+                <h3 class="text-3xl font-bold text-gray-900 mb-4">Actividad: El Consultor Digital</h3>
+                <p class="text-gray-600 max-w-2xl mx-auto">
+                    ¿Qué formato elegirías para cada situación? Sigue el diagrama de flujo para tomar la decisión correcta como un profesional.
+                </p>
+            </div>
+
+            <!-- CSS Flowchart (No Mermaid) -->
+            <div class="max-w-4xl mx-auto">
+                <div class="flex flex-col items-center space-y-4">
+                    
+                    <!-- Start Node -->
+                    <div class="bg-gray-900 text-white px-6 py-3 rounded-lg shadow-lg font-bold">
+                        ¿QUÉ NECESITAS CREAR?
+                    </div>
+                    
+                    <!-- Arrow -->
+                    <div class="h-6 w-0.5 bg-gray-400"></div>
+
+                    <!-- Branch 1 -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
+                        
+                        <!-- Left Branch (Photo) -->
+                        <div class="flex flex-col items-center">
+                            <div class="w-full h-0.5 bg-gray-400 mb-4 relative md:w-1/2 md:translate-x-1/2"></div>
+                            <div class="bg-white border-2 border-rose-500 text-rose-600 px-4 py-2 rounded-lg font-semibold text-center w-48">
+                                ¿Es una Fotografía Realista?
+                            </div>
+                            <div class="h-6 w-0.5 bg-gray-400"></div>
+                            <div class="text-sm font-bold text-gray-500 mb-2">SÍ</div>
+                            
+                            <div class="bg-rose-100 p-4 rounded-lg text-center w-full max-w-xs shadow-sm">
+                                <div class="font-bold text-rose-700 text-lg">JPEG</div>
+                                <p class="text-xs text-rose-600">Ideal para Instagram, Web y fotos de vacaciones.</p>
+                            </div>
+                        </div>
+
+                        <!-- Right Branch (Graphic) -->
+                        <div class="flex flex-col items-center">
+                            <div class="w-full h-0.5 bg-gray-400 mb-4 relative md:w-1/2 md:-translate-x-1/2"></div>
+                            <div class="bg-white border-2 border-cyan-500 text-cyan-600 px-4 py-2 rounded-lg font-semibold text-center w-48">
+                                ¿Es un Logo, Icono o Dibujo?
+                            </div>
+                            <div class="h-6 w-0.5 bg-gray-400"></div>
+                            
+                            <!-- Sub Branch -->
+                            <div class="grid grid-cols-2 gap-4 w-full max-w-sm">
+                                <div class="flex flex-col items-center">
+                                    <div class="text-sm font-bold text-gray-500 mb-2">NECESITO ESCALARLO</div>
+                                    <div class="bg-cyan-100 p-4 rounded-lg text-center w-full shadow-sm">
+                                        <div class="font-bold text-cyan-700 text-lg">SVG / AI</div>
+                                        <p class="text-xs text-cyan-600">Logotipos, tarjetas, vallas publicitarias.</p>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col items-center">
+                                    <div class="text-sm font-bold text-gray-500 mb-2">NECESITO ANIMARLO</div>
+                                    <div class="bg-purple-100 p-4 rounded-lg text-center w-full shadow-sm">
+                                        <div class="font-bold text-purple-700 text-lg">GIF</div>
+                                        <p class="text-xs text-purple-600">Memes, reacciones, banners simples.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12">
+                <div class="bg-white p-4 rounded shadow border-t-4 border-rose-500">
+                    <h5 class="font-bold text-sm text-gray-500">CASO A</h5>
+                    <p class="font-bold">Foto en Instagram</p>
+                    <p class="text-rose-500 text-xl font-black mt-2">JPEG</p>
+                </div>
+                <div class="bg-white p-4 rounded shadow border-t-4 border-cyan-500">
+                    <h5 class="font-bold text-sm text-gray-500">CASO B</h5>
+                    <p class="font-bold">Logotipo Camión</p>
+                    <p class="text-cyan-500 text-xl font-black mt-2">EPS/AI</p>
+                </div>
+                <div class="bg-white p-4 rounded shadow border-t-4 border-cyan-500">
+                    <h5 class="font-bold text-sm text-gray-500">CASO C</h5>
+                    <p class="font-bold">Icono Web Nítido</p>
+                    <p class="text-cyan-500 text-xl font-black mt-2">SVG</p>
+                </div>
+                <div class="bg-white p-4 rounded shadow border-t-4 border-purple-500">
+                    <h5 class="font-bold text-sm text-gray-500">CASO D</h5>
+                    <p class="font-bold">Meme Animado</p>
+                    <p class="text-purple-500 text-xl font-black mt-2">GIF</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-900 text-gray-400 py-8 mt-12 text-center text-sm">
+        <p>Sesión Didáctica: 4º ESO - Tecnología e Imagen Digital</p>
+        <p class="mt-2">Diseñado para aprendizaje interactivo.</p>
+    </footer>
+
+    <script>
+        // --- UTILITY: LABEL WRAPPER (16 chars) ---
+        function formatLabel(str, maxLen = 16) {
+            if (str.length <= maxLen) return str;
+            const words = str.split(' ');
+            const lines = [];
+            let currentLine = words[0];
+
+            for (let i = 1; i < words.length; i++) {
+                if ((currentLine + " " + words[i]).length <= maxLen) {
+                    currentLine += " " + words[i];
+                } else {
+                    lines.push(currentLine);
+                    currentLine = words[i];
+                }
+            }
+            lines.push(currentLine);
+            return lines;
+        }
+
+        // --- COMMON TOOLTIP CONFIG ---
+        const commonTooltip = {
+            callbacks: {
+                title: function(tooltipItems) {
+                    const item = tooltipItems[0];
+                    let label = item.chart.data.labels[item.dataIndex];
+                    if (Array.isArray(label)) {
+                        return label.join(' ');
+                    } else {
+                        return label;
+                    }
+                }
+            }
+        };
+
+        // --- CHART 1: RADAR (Bitmap vs Vector) ---
+        const ctxRadar = document.getElementById('radarChart').getContext('2d');
+        new Chart(ctxRadar, {
+            type: 'radar',
+            data: {
+                labels: [
+                    formatLabel('Escalabilidad Infinita'), 
+                    formatLabel('Realismo Fotográfico'), 
+                    formatLabel('Peso Ligero'), 
+                    formatLabel('Edición Matemática'), 
+                    formatLabel('Facilidad de Edición')
+                ],
+                datasets: [{
+                    label: 'Mapa de Bits (Píxeles)',
+                    data: [2, 10, 3, 1, 9],
+                    fill: true,
+                    backgroundColor: 'rgba(244, 63, 94, 0.2)',
+                    borderColor: 'rgb(244, 63, 94)',
+                    pointBackgroundColor: 'rgb(244, 63, 94)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgb(244, 63, 94)'
+                }, {
+                    label: 'Vectorial (Nodos)',
+                    data: [10, 2, 9, 10, 6],
+                    fill: true,
+                    backgroundColor: 'rgba(6, 182, 212, 0.2)',
+                    borderColor: 'rgb(6, 182, 212)',
+                    pointBackgroundColor: 'rgb(6, 182, 212)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgb(6, 182, 212)'
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                elements: { line: { borderWidth: 3 } },
+                scales: {
+                    r: {
+                        angleLines: { color: '#e5e7eb' },
+                        grid: { color: '#e5e7eb' },
+                        pointLabels: {
+                            font: { size: 12, family: 'Inter' }
+                        },
+                        suggestedMin: 0,
+                        suggestedMax: 10
+                    }
+                },
+                plugins: {
+                    tooltip: commonTooltip,
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+
+        // --- CHART 2: BAR (Format Features) ---
+        const ctxBar = document.getElementById('barChart').getContext('2d');
+        new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+                labels: [
+                    formatLabel('Compresión de Archivo'), 
+                    formatLabel('Soporte Transparencia'), 
+                    formatLabel('Capacidad Animación'), 
+                    formatLabel('Calidad Impresión')
+                ],
+                datasets: [
+                    {
+                        label: 'JPEG',
+                        data: [9, 0, 0, 7],
+                        backgroundColor: '#F43F5E' // Rose
+                    },
+                    {
+                        label: 'PNG',
+                        data: [6, 10, 0, 8],
+                        backgroundColor: '#3B82F6' // Blue
+                    },
+                    {
+                        label: 'GIF',
+                        data: [4, 5, 10, 2],
+                        backgroundColor: '#8B5CF6' // Purple
+                    },
+                    {
+                        label: 'SVG',
+                        data: [10, 10, 8, 10],
+                        backgroundColor: '#06B6D4' // Cyan
+                    }
+                ]
+            },
+            options: {
+                maintainAspectRatio: false,
+                scales: {
+                    y: { 
+                        beginAtZero: true, 
+                        max: 10,
+                        title: { display: true, text: 'Puntuación (0-10)' }
+                    }
+                },
+                plugins: {
+                    tooltip: commonTooltip,
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+
+        // --- CHART 3: SCATTER (Resolution vs Size) ---
+        const ctxScatter = document.getElementById('scatterChart').getContext('2d');
+        new Chart(ctxScatter, {
+            type: 'scatter',
+            data: {
+                datasets: [{
+                    label: 'Mapa de Bits (.jpg/.png)',
+                    data: [
+                        { x: 72, y: 0.5 },
+                        { x: 150, y: 2.2 },
+                        { x: 300, y: 8.5 },
+                        { x: 600, y: 32.0 },
+                        { x: 96, y: 0.8 }
+                    ],
+                    backgroundColor: '#F43F5E',
+                    pointRadius: 6
+                },
+                {
+                    label: 'Vectorial (.svg)',
+                    data: [
+                        { x: 72, y: 0.05 },
+                        { x: 150, y: 0.05 },
+                        { x: 300, y: 0.05 },
+                        { x: 600, y: 0.05 },
+                        { x: 1200, y: 0.05 }
+                    ],
+                    backgroundColor: '#06B6D4',
+                    pointRadius: 6,
+                    pointStyle: 'rectRot'
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        type: 'linear',
+                        position: 'bottom',
+                        title: { display: true, text: 'Resolución (PPI)', color: '#9ca3af' },
+                        grid: { color: '#374151' },
+                        ticks: { color: '#9ca3af' }
+                    },
+                    y: {
+                        title: { display: true, text: 'Peso de Archivo (MB)', color: '#9ca3af' },
+                        grid: { color: '#374151' },
+                        ticks: { color: '#9ca3af' }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            title: function(tooltipItems) {
+                                return 'Resolución: ' + tooltipItems[0].raw.x + ' PPI';
+                            },
+                            label: function(context) {
+                                return context.dataset.label + ': ' + context.raw.y + ' MB';
+                            }
+                        }
+                    },
+                    legend: {
+                        labels: { color: '#fff' }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
