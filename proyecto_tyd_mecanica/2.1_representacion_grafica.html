@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Escalas Interactivo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        .canvas-area {
+            background-image: 
+                linear-gradient(#e2e8f0 1px, transparent 1px),
+                linear-gradient(90deg, #e2e8f0 1px, transparent 1px);
+            background-size: 20px 20px;
+            min-height: 400px;
+        }
+
+        .object-transition {
+            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .btn-scale {
+            @apply px-4 py-2 rounded-xl text-sm font-semibold transition-all border-2;
+        }
+
+        .btn-active {
+            @apply bg-blue-600 border-blue-600 text-white shadow-lg scale-105;
+        }
+
+        .btn-inactive {
+            @apply bg-white border-slate-200 text-slate-600 hover:border-blue-300 hover:text-blue-500;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-4xl mx-auto space-y-8">
+        <!-- Encabezado -->
+        <div class="text-center space-y-2">
+            <h1 class="text-3xl font-bold text-slate-900">Interactúa con las Escalas</h1>
+            <p class="text-slate-500 max-w-xl mx-auto">
+                Selecciona un objeto y cambia su escala para comprender la relación matemática $E = d / r$ (Dibujo / Realidad).
+            </p>
+        </div>
+
+        <!-- Panel de Control Principal -->
+        <div class="bg-white p-6 rounded-3xl shadow-xl border border-slate-100 space-y-8">
+            
+            <!-- Selector de Objeto -->
+            <div class="flex flex-col items-center space-y-4">
+                <span class="text-xs font-bold uppercase tracking-widest text-slate-400">1. Selecciona un objeto real</span>
+                <div class="flex gap-4">
+                    <button onclick="setObject('microchip', 'fas fa-microchip', 'Ampliación')" class="obj-btn p-4 rounded-2xl bg-slate-50 border-2 border-transparent hover:bg-blue-50 transition" title="Microchip (Pequeño)">
+                        <i class="fas fa-microchip text-2xl text-slate-600"></i>
+                    </button>
+                    <button onclick="setObject('silla', 'fas fa-chair', 'Natural')" class="obj-btn p-4 rounded-2xl bg-blue-50 border-2 border-blue-200" title="Silla (Mediano)">
+                        <i class="fas fa-chair text-2xl text-blue-600"></i>
+                    </button>
+                    <button onclick="setObject('edificio', 'fas fa-city', 'Reducción')" class="obj-btn p-4 rounded-2xl bg-slate-50 border-2 border-transparent hover:bg-blue-50 transition" title="Edificio (Grande)">
+                        <i class="fas fa-city text-2xl text-slate-600"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Selector de Escala -->
+            <div class="flex flex-col items-center space-y-4">
+                <span class="text-xs font-bold uppercase tracking-widest text-slate-400">2. Cambia la escala del dibujo</span>
+                <div id="scale-buttons" class="flex flex-wrap justify-center gap-3">
+                    <button onclick="changeScale(0.2, '1:5', this)" class="btn-scale btn-inactive">Reducción 1:5</button>
+                    <button onclick="changeScale(0.5, '1:2', this)" class="btn-scale btn-inactive">Reducción 1:2</button>
+                    <button onclick="changeScale(1, '1:1', this)" class="btn-scale btn-active">Natural 1:1</button>
+                    <button onclick="changeScale(2, '2:1', this)" class="btn-scale btn-inactive">Ampliación 2:1</button>
+                    <button onclick="changeScale(5, '5:1', this)" class="btn-scale btn-inactive">Ampliación 5:1</button>
+                </div>
+            </div>
+
+            <!-- Área de Visualización -->
+            <div class="canvas-area rounded-2xl relative flex items-center justify-center border-2 border-slate-100 overflow-hidden">
+                <div id="container" class="object-transition flex items-center justify-center bg-white shadow-md border-2 border-dashed border-blue-400 rounded-lg relative" style="width: 120px; height: 120px;">
+                    <i id="main-icon" class="fas fa-chair text-4xl text-blue-600"></i>
+                    
+                    <!-- Etiqueta de Escala -->
+                    <div class="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap">
+                        <span id="current-label" class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded">ESCALA 1:1</span>
+                    </div>
+                </div>
+
+                <!-- Referencia de tamaño real (fija) -->
+                <div class="absolute top-4 right-4 text-[10px] text-slate-400 font-mono text-right bg-white/80 p-2 rounded">
+                    Tamaño Real del Objeto: <br>
+                    <span id="real-size-text">Silla (Aprox. 45cm base)</span>
+                </div>
+            </div>
+
+            <!-- Explicación Didáctica -->
+            <div id="explanation-box" class="bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                <h4 class="font-bold text-slate-800 mb-2 flex items-center gap-2">
+                    <i class="fas fa-info-circle text-blue-500"></i> 
+                    ¿Qué estamos viendo?
+                </h4>
+                <p id="explanation-text" class="text-sm text-slate-600 leading-relaxed">
+                    En la escala <strong>Natural (1:1)</strong>, el dibujo tiene el mismo tamaño que el objeto real. Es la forma más sencilla de representar objetos que caben en nuestro papel.
+                </p>
+            </div>
+        </div>
+
+        <!-- Footer Informativo -->
+        <footer class="text-center space-y-2 pb-12">
+            <div class="inline-flex items-center gap-4 text-xs font-bold text-slate-400 uppercase tracking-tighter">
+                <span>Reducción (E < 1)</span>
+                <span class="text-slate-200">|</span>
+                <span>Natural (E = 1)</span>
+                <span class="text-slate-200">|</span>
+                <span>Ampliación (E > 1)</span>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        let currentFactor = 1;
+        let currentObject = 'silla';
+        const baseSize = 120; // Tamaño base en píxeles para 1:1
+
+        const dataMap = {
+            'microchip': {
+                name: 'Microchip',
+                size: '5mm x 5mm',
+                natural: 'Para ver sus conexiones, normalmente necesitamos escalas de <strong>Ampliación</strong> (como 10:1).'
+            },
+            'silla': {
+                name: 'Silla',
+                size: '45cm x 45cm',
+                natural: 'Para que quepa en un folio, solemos usar escalas de <strong>Reducción</strong> (como 1:10).'
+            },
+            'edificio': {
+                name: 'Edificio',
+                size: '20m x 40m',
+                natural: '¡Es imposible dibujarlo a tamaño natural! Siempre usamos <strong>Reducción</strong> extrema (como 1:200).'
+            }
+        };
+
+        function setObject(type, iconClass, recommended) {
+            currentObject = type;
+            const icon = document.getElementById('main-icon');
+            icon.className = iconClass + ' text-4xl text-blue-600 transition-all duration-300';
+            
+            // Actualizar botones visuales
+            document.querySelectorAll('.obj-btn').forEach(btn => {
+                btn.classList.remove('bg-blue-50', 'border-blue-200');
+                btn.classList.add('bg-slate-50', 'border-transparent');
+                btn.querySelector('i').classList.remove('text-blue-600');
+                btn.querySelector('i').classList.add('text-slate-600');
+            });
+
+            const activeBtn = event.currentTarget;
+            activeBtn.classList.add('bg-blue-50', 'border-blue-200');
+            activeBtn.querySelector('i').classList.add('text-blue-600');
+
+            document.getElementById('real-size-text').innerText = `${dataMap[type].name} (Real: ${dataMap[type].size})`;
+            
+            updateVisuals();
+        }
+
+        function changeScale(factor, label, btn) {
+            currentFactor = factor;
+            
+            // Actualizar botones de escala
+            document.querySelectorAll('.btn-scale').forEach(b => {
+                b.classList.remove('btn-active');
+                b.classList.add('btn-inactive');
+            });
+            btn.classList.add('btn-active');
+            btn.classList.remove('btn-inactive');
+
+            updateVisuals(label);
+        }
+
+        function updateVisuals(label = null) {
+            const container = document.getElementById('container');
+            const icon = document.getElementById('main-icon');
+            const labelEl = document.getElementById('current-label');
+            const expText = document.getElementById('explanation-text');
+
+            if (label) labelEl.innerText = `ESCALA ${label}`;
+
+            const newSize = baseSize * currentFactor;
+            container.style.width = newSize + 'px';
+            container.style.height = newSize + 'px';
+            
+            // Ajustar icono proporcionalmente para que no se salga
+            icon.style.fontSize = (32 * currentFactor) + 'px';
+
+            // Generar explicación
+            let typeText = "";
+            if (currentFactor < 1) {
+                typeText = `Estás usando una escala de <strong>Reducción</strong>. El dibujo es ${1/currentFactor} veces más pequeño que la realidad. `;
+            } else if (currentFactor === 1) {
+                typeText = `Estás en escala <strong>Natural</strong>. El dibujo mide exactamente lo mismo que el objeto real. `;
+            } else {
+                typeText = `Estás usando una escala de <strong>Ampliación</strong>. El dibujo es ${currentFactor} veces más grande que la realidad. `;
+            }
+
+            expText.innerHTML = `${typeText} <br><br> <span class="text-blue-500 font-semibold">Contexto:</span> ${dataMap[currentObject].natural}`;
+        }
+    </script>
+</body>
+</html>
