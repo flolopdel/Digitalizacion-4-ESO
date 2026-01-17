@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía Interactiva: Marble Run de Cartón</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Custom Font Import */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fdfbf7; /* Warm neutral, paper-like */
+            color: #1f2937;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d97706;
+            border-radius: 4px;
+        }
+
+        /* Blueprint Pattern for "Ingeniería" section */
+        .bg-blueprint {
+            background-color: #eff6ff;
+            background-image: linear-gradient(#dbeafe 1px, transparent 1px), linear-gradient(90deg, #dbeafe 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        /* Chart Container Strict Styling */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        
+        .active-nav {
+            border-bottom: 3px solid #d97706;
+            color: #d97706;
+            font-weight: 700;
+        }
+        
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: transform 0.2s;
+        }
+        
+        .card-shadow:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+    <!-- Chosen Palette: Warm Industrial. Background: Off-white (#fdfbf7). Accents: Construction Amber (#d97706) and Blueprint Blue (#2563eb). Text: Dark Gray. -->
+    
+    <!-- Application Structure Plan: 
+         1. Header/Nav: Quick access to 4 main modules (Planificación, Construcción, Física/Simulación, Acabados).
+         2. Dashboard "Planificación": Interactive BOM (Bill of Materials) and Dimensions Overview (Blueprint).
+         3. Module "Construcción": Vertical Step-by-Step timeline with expandable details and progress tracking.
+         4. Module "Laboratorio de Física": Interactive Chart.js visualizer for "Slope Efficiency" (Angle vs. Friction) to teach the 5-10 degree rule.
+         5. Footer: Summary and encouragement.
+         
+         Rationale: The report is technical but fun. A dashboard approach allows the user to jump between checking materials and calculating slopes without losing context. The "Physics Lab" gamifies the dry "slope" data.
+    -->
+
+    <!-- Visualization & Content Choices:
+         1. Material List -> Goal: Organize -> Checkboxes with dynamic progress counter -> JS updates DOM.
+         2. Structure Dimensions -> Goal: Inform/Visualize -> CSS Grid "Blueprint" representing the 60x45cm base -> Pure HTML/CSS (No SVG).
+         3. Slope Physics -> Goal: Inform/Change -> Chart.js Line Chart showing the "Sweet Spot" (5-10 deg). User slider adjusts a point on the chart -> Chart.js.
+         4. Step Guide -> Goal: Inform/Process -> Accordion style timeline -> Vanilla JS show/hide.
+         
+         CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
+    -->
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <!-- Navigation -->
+    <nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-2xl font-bold text-amber-600 mr-2">⚙️</span>
+                    <h1 class="text-xl font-bold tracking-tight text-gray-900">MarbleRun<span class="text-amber-600">Architect</span></h1>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <button onclick="switchTab('planificacion')" id="nav-planificacion" class="active-nav inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900 hover:text-amber-600 transition-colors">
+                        📏 Planificación
+                    </button>
+                    <button onclick="switchTab('construccion')" id="nav-construccion" class="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-500 hover:text-amber-600 transition-colors">
+                        🔨 Construcción
+                    </button>
+                    <button onclick="switchTab('laboratorio')" id="nav-laboratorio" class="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-500 hover:text-amber-600 transition-colors">
+                        🧪 Laboratorio de Física
+                    </button>
+                    <button onclick="switchTab('acabados')" id="nav-acabados" class="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-500 hover:text-amber-600 transition-colors">
+                        ✨ Ajustes Finales
+                    </button>
+                </div>
+                <!-- Mobile menu button (simplified for single file) -->
+                <div class="flex items-center md:hidden">
+                    <button onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" class="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100">
+                        ☰
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t">
+            <button onclick="switchTab('planificacion')" class="block w-full text-left px-4 py-2 text-base font-medium text-gray-700 hover:bg-gray-50">Planificación</button>
+            <button onclick="switchTab('construccion')" class="block w-full text-left px-4 py-2 text-base font-medium text-gray-700 hover:bg-gray-50">Construcción</button>
+            <button onclick="switchTab('laboratorio')" class="block w-full text-left px-4 py-2 text-base font-medium text-gray-700 hover:bg-gray-50">Laboratorio</button>
+            <button onclick="switchTab('acabados')" class="block w-full text-left px-4 py-2 text-base font-medium text-gray-700 hover:bg-gray-50">Ajustes Finales</button>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+
+        <!-- SECTION 1: PLANIFICACIÓN (DASHBOARD) -->
+        <div id="planificacion" class="section-content animate-fade-in">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-extrabold text-gray-900 sm:text-4xl">Planificación del Proyecto</h2>
+                <p class="mt-3 max-w-2xl mx-auto text-xl text-gray-500 sm:mt-4">
+                    Antes de cortar el primer cartón, verifica tus materiales y comprende las dimensiones críticas. 
+                    Esta fase es vital para asegurar que la estructura soporte el mecanismo.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Checklist de Materiales -->
+                <div class="bg-white overflow-hidden shadow rounded-lg border-t-4 border-amber-500">
+                    <div class="px-4 py-5 sm:p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900">📦 Inventario de Materiales</h3>
+                            <span id="material-progress" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                                0% Listo
+                            </span>
+                        </div>
+                        <ul class="space-y-3" id="material-list">
+                            <!-- JS populates this -->
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Plano Interactivo (CSS Blueprint) -->
+                <div class="bg-white overflow-hidden shadow rounded-lg border-t-4 border-blue-500">
+                    <div class="px-4 py-5 sm:p-6 h-full flex flex-col">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900 mb-2">📐 Especificaciones Técnicas</h3>
+                        <p class="text-sm text-gray-500 mb-4">Pasa el mouse sobre los bloques para ver las medidas exactas.</p>
+                        
+                        <div class="flex-grow bg-blueprint relative rounded-md border border-gray-200 overflow-hidden flex items-center justify-center min-h-[300px]" id="blueprint-container">
+                            <!-- Base -->
+                            <div class="blueprint-item absolute bottom-4 bg-gray-300 border-2 border-gray-500 flex items-center justify-center cursor-help transition-all hover:bg-amber-200"
+                                 style="width: 80%; height: 40px;"
+                                 onmouseover="showTooltip('Base Principal', '60cm x 45cm', 'Cartón corrugado doble para estabilidad.')"
+                                 onmouseout="hideTooltip()">
+                                <span class="text-xs font-bold text-gray-700">BASE</span>
+                            </div>
+                            
+                            <!-- Columnas -->
+                            <div class="blueprint-item absolute bottom-14 left-[15%] bg-gray-200 border-2 border-dashed border-gray-400 flex items-end justify-center cursor-help hover:bg-blue-200 transition-all"
+                                 style="width: 10%; height: 70%;"
+                                 onmouseover="showTooltip('Torre Izquierda', '50cm Alto x 5cm Ancho', 'Soporta el inicio del recorrido.')"
+                                 onmouseout="hideTooltip()">
+                            </div>
+                            <div class="blueprint-item absolute bottom-14 right-[15%] bg-gray-200 border-2 border-dashed border-gray-400 flex items-end justify-center cursor-help hover:bg-blue-200 transition-all"
+                                 style="width: 10%; height: 70%;"
+                                 onmouseover="showTooltip('Torre Derecha', '50cm Alto x 5cm Ancho', 'Soporta el mecanismo de elevación.')"
+                                 onmouseout="hideTooltip()">
+                            </div>
+
+                            <!-- Pista Ejemplo -->
+                            <div class="blueprint-item absolute top-[30%] left-[16%] bg-amber-100 border-b-4 border-amber-600 transform rotate-6 cursor-help hover:bg-amber-300 transition-all"
+                                 style="width: 68%; height: 20px;"
+                                 onmouseover="showTooltip('Pista Estándar', '4cm Ancho Total', 'Pendiente de 5° a 10°. Base de 2cm + Paredes de 1cm.')"
+                                 onmouseout="hideTooltip()">
+                                 <div class="absolute -top-6 left-1/2 text-xs text-amber-700 font-bold">10° Pendiente</div>
+                            </div>
+
+                            <!-- Tooltip Overlay -->
+                            <div id="blueprint-tooltip" class="hidden absolute top-2 left-2 bg-gray-800 text-white text-xs p-2 rounded shadow-lg z-10 max-w-[200px]">
+                                <strong id="tt-title" class="block text-amber-400 mb-1"></strong>
+                                <span id="tt-dims" class="block font-mono bg-gray-700 px-1 rounded mb-1"></span>
+                                <span id="tt-desc"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 2: CONSTRUCCIÓN (STEP BY STEP) -->
+        <div id="construccion" class="section-content hidden">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-extrabold text-gray-900 sm:text-4xl">Proceso de Construcción</h2>
+                <p class="mt-3 max-w-2xl mx-auto text-xl text-gray-500 sm:mt-4">
+                    Sigue estos 4 pasos críticos. Cada fase contiene medidas precisas que no debes ignorar.
+                    La precisión aquí evita atascos después.
+                </p>
+            </div>
+
+            <div class="space-y-8" id="steps-container">
+                <!-- Steps injected via JS -->
+            </div>
+        </div>
+
+        <!-- SECTION 3: LABORATORIO DE FÍSICA (CHARTS) -->
+        <div id="laboratorio" class="section-content hidden">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-extrabold text-gray-900 sm:text-4xl">Laboratorio de Física</h2>
+                <p class="mt-3 max-w-2xl mx-auto text-xl text-gray-500 sm:mt-4">
+                    ¿Por qué las canicas se detienen o salen volando? Entiende la ciencia detrás de la pendiente perfecta.
+                    Usa el simulador para encontrar el "Punto Dulce" (Sweet Spot).
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Controls -->
+                <div class="lg:col-span-1 bg-white p-6 rounded-lg shadow border border-gray-200">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">🎛️ Simulador de Pendiente</h3>
+                    
+                    <div class="mb-6">
+                        <label for="slopeSlider" class="block text-sm font-medium text-gray-700 mb-2">Ángulo de Inclinación (°)</label>
+                        <input type="range" id="slopeSlider" min="0" max="25" value="7" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-amber-600">
+                        <div class="flex justify-between text-xs text-gray-500 mt-1">
+                            <span>0° (Plano)</span>
+                            <span id="slopeValue" class="font-bold text-amber-600 text-lg">7°</span>
+                            <span>25° (Caída Libre)</span>
+                        </div>
+                    </div>
+
+                    <div id="simulation-feedback" class="p-4 rounded bg-green-50 border border-green-200 text-green-800 text-sm">
+                        <!-- Dynamic Feedback -->
+                    </div>
+
+                    <div class="mt-6 border-t pt-4">
+                        <h4 class="font-bold text-sm mb-2">Regla de Oro:</h4>
+                        <p class="text-sm text-gray-600 italic">
+                            "Bajar 1 cm por cada 10 cm de recorrido horizontal."
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Chart Container -->
+                <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow border border-gray-200 flex flex-col">
+                    <h3 class="text-lg font-bold text-gray-900 mb-2">📊 Análisis de Eficiencia de Energía Cinética</h3>
+                    <div class="flex-grow flex items-center justify-center bg-gray-50 rounded border border-gray-100 p-2">
+                         <div class="chart-container">
+                            <canvas id="slopeChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Additional Calculators -->
+             <div class="mt-8 bg-white p-6 rounded-lg shadow border-l-4 border-indigo-500">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">🧮 Calculadora de Caída</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Largo del tramo (cm)</label>
+                        <input type="number" id="calc-length" value="30" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2 border focus:ring-amber-500 focus:border-amber-500" oninput="calculateDrop()">
+                    </div>
+                    <div>
+                         <label class="block text-sm font-medium text-gray-700">Caída Recomendada (cm)</label>
+                         <div id="calc-result" class="mt-1 block w-full bg-gray-100 p-2 rounded-md font-bold text-indigo-600">3.0 cm</div>
+                    </div>
+                    <div class="text-sm text-gray-500 pb-2">
+                        Basado en el ratio 1:10 para asegurar movimiento constante sin exceso de velocidad.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 4: AJUSTES FINALES (ACABADOS) -->
+        <div id="acabados" class="section-content hidden">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-extrabold text-gray-900 sm:text-4xl">Ajustes y Calibración</h2>
+                <p class="mt-3 max-w-2xl mx-auto text-xl text-gray-500 sm:mt-4">
+                    El secreto de un circuito infinito está en los detalles. Aquí tienes la lista de verificación final.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow border-t-4 border-red-500">
+                    <div class="text-2xl mb-2">🛑 Fricción</div>
+                    <h3 class="font-bold text-lg mb-2">Problema: La cinta resbala</h3>
+                    <p class="text-gray-600 text-sm">Rodea las ruedas de cartón con una banda elástica o lija fina para aumentar el agarre con la cinta.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow border-t-4 border-green-500">
+                    <div class="text-2xl mb-2">🔊 Ruido</div>
+                    <h3 class="font-bold text-lg mb-2">Problema: Muy ruidoso</h3>
+                    <p class="text-gray-600 text-sm">Pega pequeños trozos de fieltro o foamy en los puntos de impacto donde las canicas caen de un nivel a otro.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow border-t-4 border-yellow-500">
+                    <div class="text-2xl mb-2">⚡ Velocidad</div>
+                    <h3 class="font-bold text-lg mb-2">Problema: Motor muy rápido</h3>
+                    <p class="text-gray-600 text-sm">Añade una resistencia en serie o usa un potenciómetro para bajar el voltaje si las canicas salen despedidas.</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white mt-auto">
+        <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 text-center">
+            <p class="text-gray-400">Generado a partir del reporte técnico: <span class="text-white font-bold">Máquina de Marble Run Automática</span>.</p>
+            <p class="mt-2 text-sm text-gray-500">Recuerda: La paciencia es la herramienta más importante.</p>
+        </div>
+    </footer>
+
+    <script>
+        // --- DATA & CONTENT ---
+        
+        const materials = [
+            { id: 'mat1', text: 'Cartón Corrugado Doble (Base 60x45cm)', checked: false },
+            { id: 'mat2', text: 'Cartón para Torres (50cm alto)', checked: false },
+            { id: 'mat3', text: 'Tiras de Pista (4cm ancho total)', checked: false },
+            { id: 'mat4', text: 'Motor DC 3V-6V con reductora', checked: false },
+            { id: 'mat5', text: 'Portapilas y Pilas', checked: false },
+            { id: 'mat6', text: 'Palitos de Brocheta (Ejes)', checked: false },
+            { id: 'mat7', text: 'Silicona Caliente', checked: false },
+            { id: 'mat8', text: 'Canicas (16mm diámetro)', checked: false },
+        ];
+
+        const constructionSteps = [
+            {
+                title: "1. El Corazón: Estructura de Elevación",
+                icon: "🏗️",
+                details: "El elevador es lo primero. Corta 4 círculos de 10cm de diámetro. Únelos de dos en dos para crear las poleas superior e inferior. La cinta debe tener 110cm de largo y 3cm de ancho. Los 'cangilones' (cestas) son cubos de 3x3cm pegados cada 10cm.",
+                warning: "Asegura bien el eje del motor a la polea inferior para que no patine."
+            },
+            {
+                title: "2. Las Arterias: Diseño de Pistas",
+                icon: "🛣️",
+                details: "Corta tiras largas de 4cm de ancho. Marca 1cm a cada lado y dobla para crear paredes. La base útil será de 2cm. Para las curvas de 180°, haz formas de 'U' con un radio exterior de 8cm y paredes de 2cm de alto.",
+                warning: "Paredes más altas en curvas evitan que la fuerza centrífuga expulse la canica."
+            },
+            {
+                title: "3. Obstáculos Mecánicos",
+                icon: "🌀",
+                details: "Embudo: Círculo de 20cm con corte radial. Zig-Zag: Rampas de 15cm con aberturas alternas. Espiral: Anillo de 15cm estirado verticalmente.",
+                warning: "Prueba el embudo con una canica antes de pegarlo definitivamente."
+            },
+            {
+                title: "4. Montaje y Calibración",
+                icon: "🔧",
+                details: "Instala el elevador en la base. Coloca la primera rampa bajo la salida superior (aprox 48cm de alto). Diseña el camino hacia abajo asegurando que el final converja en la entrada inferior del elevador.",
+                warning: "Cierra el circuito: la última rampa debe alimentar el elevador automáticamente."
+            }
+        ];
+
+        // --- CORE LOGIC ---
+
+        // Tab Switching
+        function switchTab(tabId) {
+            // Hide all sections
+            document.querySelectorAll('.section-content').forEach(el => {
+                el.classList.add('hidden');
+            });
+            
+            // Remove active style from nav
+            document.querySelectorAll('nav button').forEach(el => {
+                el.classList.remove('active-nav');
+                el.classList.remove('text-gray-900');
+                el.classList.add('text-gray-500');
+            });
+
+            // Show selected section
+            document.getElementById(tabId).classList.remove('hidden');
+            
+            // Add active style
+            const activeBtn = document.getElementById('nav-' + tabId);
+            if(activeBtn) {
+                activeBtn.classList.add('active-nav');
+                activeBtn.classList.add('text-gray-900');
+                activeBtn.classList.remove('text-gray-500');
+            }
+
+            // Mobile menu handling if needed (simplified here)
+        }
+
+        // --- MODULE 1: PLANNING (Materials) ---
+        
+        function renderMaterials() {
+            const listEl = document.getElementById('material-list');
+            listEl.innerHTML = '';
+            let checkedCount = 0;
+
+            materials.forEach((mat, index) => {
+                if(mat.checked) checkedCount++;
+                
+                const li = document.createElement('li');
+                li.className = "relative flex items-start";
+                li.innerHTML = `
+                    <div class="flex items-center h-5">
+                        <input id="mat-${index}" name="mat-${index}" type="checkbox" 
+                            class="focus:ring-amber-500 h-4 w-4 text-amber-600 border-gray-300 rounded cursor-pointer"
+                            ${mat.checked ? 'checked' : ''} onchange="toggleMaterial(${index})">
+                    </div>
+                    <div class="ml-3 text-sm">
+                        <label for="mat-${index}" class="font-medium text-gray-700 cursor-pointer ${mat.checked ? 'line-through text-gray-400' : ''}">${mat.text}</label>
+                    </div>
+                `;
+                listEl.appendChild(li);
+            });
+
+            // Update Progress
+            const pct = Math.round((checkedCount / materials.length) * 100);
+            const badge = document.getElementById('material-progress');
+            badge.innerText = `${pct}% Listo`;
+            if(pct === 100) {
+                badge.className = "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800";
+            } else {
+                badge.className = "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800";
+            }
+        }
+
+        function toggleMaterial(index) {
+            materials[index].checked = !materials[index].checked;
+            renderMaterials();
+        }
+
+        // Blueprint Tooltip
+        function showTooltip(title, dims, desc) {
+            const tt = document.getElementById('blueprint-tooltip');
+            document.getElementById('tt-title').innerText = title;
+            document.getElementById('tt-dims').innerText = dims;
+            document.getElementById('tt-desc').innerText = desc;
+            tt.classList.remove('hidden');
+        }
+
+        function hideTooltip() {
+            document.getElementById('blueprint-tooltip').classList.add('hidden');
+        }
+
+        // --- MODULE 2: CONSTRUCTION (Steps) ---
+
+        function renderSteps() {
+            const container = document.getElementById('steps-container');
+            container.innerHTML = '';
+
+            constructionSteps.forEach((step, index) => {
+                const div = document.createElement('div');
+                div.className = "bg-white shadow overflow-hidden rounded-md border border-gray-200 card-shadow";
+                div.innerHTML = `
+                    <div class="px-4 py-5 sm:px-6 cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors" onclick="toggleStep(${index})">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900">
+                                <span class="text-2xl mr-2">${step.icon}</span> ${step.title}
+                            </h3>
+                            <span class="text-gray-400 transform transition-transform" id="arrow-${index}">▼</span>
+                        </div>
+                    </div>
+                    <div class="border-t border-gray-200 px-4 py-5 sm:p-6 hidden transition-all duration-300 ease-in-out" id="step-content-${index}">
+                        <p class="text-gray-600 mb-4">${step.details}</p>
+                        <div class="rounded-md bg-amber-50 p-4 border-l-4 border-amber-400">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    ⚠️
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm text-amber-700">
+                                        ${step.warning}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function toggleStep(index) {
+            const content = document.getElementById(`step-content-${index}`);
+            const arrow = document.getElementById(`arrow-${index}`);
+            
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                arrow.style.transform = "rotate(180deg)";
+            } else {
+                content.classList.add('hidden');
+                arrow.style.transform = "rotate(0deg)";
+            }
+        }
+
+        // --- MODULE 3: PHYSICS LAB (Charts & Logic) ---
+
+        let slopeChartInstance = null;
+
+        function initChart() {
+            const ctx = document.getElementById('slopeChart').getContext('2d');
+            
+            // Data for the curve
+            const labels = Array.from({length: 26}, (_, i) => i); // 0 to 25 degrees
+            const efficiencyData = labels.map(deg => {
+                // Simulation of efficiency: 
+                // < 5 deg: Low (Stops)
+                // 5-10 deg: High (Sweet Spot)
+                // > 10 deg: Low (Too fast/Flies off)
+                if (deg < 3) return 20; 
+                if (deg < 5) return 60;
+                if (deg >= 5 && deg <= 10) return 95; // Optimal
+                if (deg > 10 && deg <= 15) return 80; // Fast
+                return 40; // Danger
+            });
+
+            slopeChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Eficiencia de Flujo (%)',
+                        data: efficiencyData,
+                        borderColor: '#d97706',
+                        backgroundColor: 'rgba(217, 119, 6, 0.1)',
+                        borderWidth: 3,
+                        pointRadius: 0,
+                        fill: true,
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Tu Selección',
+                        data: Array(26).fill(null), // Placeholder for the point
+                        borderColor: '#2563eb',
+                        backgroundColor: '#2563eb',
+                        pointRadius: 8,
+                        pointHoverRadius: 10,
+                        showLine: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: { display: true, text: 'Fiabilidad del Recorrido' }
+                        },
+                        x: {
+                            title: { display: true, text: 'Ángulo de Pendiente (°)' }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y + '%';
+                                }
+                            }
+                        },
+                        annotation: {
+                            // Annotation plugin logic simplified manually below via text
+                        }
+                    }
+                }
+            });
+            
+            // Set initial point
+            updateChartPoint(7);
+        }
+
+        function updateChartPoint(val) {
+            const index = parseInt(val);
+            const newData = Array(26).fill(null);
+            
+            // Logic to determine Y value based on curve logic
+            let efficiency = 0;
+             if (val < 3) efficiency = 20; 
+             else if (val < 5) efficiency = 60;
+             else if (val >= 5 && val <= 10) efficiency = 95; 
+             else if (val > 10 && val <= 15) efficiency = 80;
+             else efficiency = 40;
+
+            newData[index] = efficiency;
+            
+            slopeChartInstance.data.datasets[1].data = newData;
+            slopeChartInstance.update();
+
+            // Feedback Text
+            const fb = document.getElementById('simulation-feedback');
+            const valSpan = document.getElementById('slopeValue');
+            valSpan.innerText = val + "°";
+
+            if (val >= 5 && val <= 10) {
+                fb.className = "p-4 rounded bg-green-100 border border-green-300 text-green-800 font-medium text-sm";
+                fb.innerHTML = "✅ <strong>¡Perfecto!</strong> En este rango la canica tiene suficiente inercia para no detenerse, pero no tanta velocidad para salir volando en las curvas.";
+            } else if (val < 5) {
+                fb.className = "p-4 rounded bg-red-100 border border-red-300 text-red-800 font-medium text-sm";
+                fb.innerHTML = "🛑 <strong>Demasiado Plano.</strong> La fricción del cartón detendrá la canica. Necesitas más inclinación.";
+            } else {
+                fb.className = "p-4 rounded bg-yellow-100 border border-yellow-300 text-yellow-800 font-medium text-sm";
+                fb.innerHTML = "⚠️ <strong>Peligro de Descarrilamiento.</strong> Demasiada velocidad. Asegúrate de tener paredes altas en las curvas o reduce el ángulo.";
+            }
+        }
+
+        // Drop Calculator
+        function calculateDrop() {
+            const length = document.getElementById('calc-length').value;
+            const drop = (length / 10).toFixed(1);
+            document.getElementById('calc-result').innerText = drop + " cm";
+        }
+
+        // --- INITIALIZATION ---
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            renderMaterials();
+            renderSteps();
+            initChart();
+
+            // Event Listener for Slider
+            document.getElementById('slopeSlider').addEventListener('input', (e) => {
+                updateChartPoint(e.target.value);
+            });
+        });
+
+    </script>
+</body>
+</html>

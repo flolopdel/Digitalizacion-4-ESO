@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual Maestro: Marble Run de Ingeniería</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #f8f9fa;
+            color: #1a202c;
+        }
+
+        .bg-blueprint {
+            background-color: #f1f5f9;
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 15px 15px;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+
+        .step-card {
+            border-left: 4px solid #d97706;
+            transition: all 0.3s ease;
+        }
+
+        .step-card:hover {
+            border-left-width: 8px;
+            background-color: #fffbeb;
+        }
+
+        .active-nav {
+            color: #d97706;
+            border-bottom: 3px solid #d97706;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: #e2e8f0;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #d97706;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        details summary::-webkit-details-marker {
+            display: none;
+        }
+    </style>
+    <!-- Chosen Palette: Industrial Craft. Background: Light Gray (#f8f9fa). Primary: Amber (#d97706). Secondary: Slate (#475569). -->
+    
+    <!-- Application Structure Plan: 
+         La estructura se ha rediseñado para ser una progresión técnica lineal pero explorable. 
+         1. Introducción y Dashboard de Preparación: Control de materiales y lógica de diseño.
+         2. Masterclass de Construcción: Un desglose exhaustivo en 6 etapas críticas con sub-pasos específicos.
+         3. Simulador de Física: Herramienta para validar la teoría antes de la práctica.
+         4. Guía de Troubleshooting: Resolución de problemas complejos.
+         
+         Se eligió esta estructura porque la construcción de una máquina de este tipo falla por falta de detalles en las uniones y las pendientes.
+    -->
+
+    <!-- Visualization & Content Choices:
+         - Proceso de Construcción -> Lista jerárquica con detalles expandibles -> JS para interactividad -> Mayor profundidad visual.
+         - Planos de Corte -> Diagramas CSS -> Representación visual de medidas de cartón.
+         - Dinámica de Canicas -> Chart.js -> Gráfico de velocidad vs. estabilidad.
+         - Inventario -> Lista con estado persistente en la sesión.
+         
+         CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
+    -->
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <span class="text-amber-600 text-2xl">🛠️</span>
+                <span class="text-xl font-bold text-slate-800 tracking-tight">Marble<span class="text-amber-600">Master</span> v2.0</span>
+            </div>
+            <div class="hidden md:flex space-x-6 text-sm font-semibold uppercase tracking-wider">
+                <button onclick="switchTab('tab-prep')" class="nav-btn active-nav py-5">1. Preparación</button>
+                <button onclick="switchTab('tab-build')" class="nav-btn py-5">2. Construcción Detallada</button>
+                <button onclick="switchTab('tab-physics')" class="nav-btn py-5">3. Laboratorio</button>
+            </div>
+            <div class="md:hidden">
+                <button onclick="toggleMobileMenu()" class="text-slate-600">Menu</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow max-w-5xl mx-auto w-full p-6">
+        
+        <!-- SECTION 1: PREPARACIÓN -->
+        <div id="tab-prep" class="tab-content animate-fade-in">
+            <header class="mb-10 text-center">
+                <h1 class="text-4xl font-bold text-slate-900 mb-2">Fundamentos y Materiales</h1>
+                <p class="text-slate-600">La calidad de tu máquina depende de la rigidez de tus bases.</p>
+            </header>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                    <h3 class="text-lg font-bold mb-4 flex items-center">
+                        <span class="mr-2">📋</span> Lista de Despiece
+                    </h3>
+                    <div class="space-y-3" id="mat-checklist">
+                        <!-- JS Loaded -->
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                    <h3 class="text-lg font-bold mb-4">📐 Dimensiones Críticas</h3>
+                    <ul class="text-sm space-y-4">
+                        <li class="flex justify-between border-b pb-2">
+                            <span class="text-slate-500">Base Principal</span>
+                            <span class="font-mono font-bold">600 x 450 mm</span>
+                        </li>
+                        <li class="flex justify-between border-b pb-2">
+                            <span class="text-slate-500">Ancho de Pista (Interior)</span>
+                            <span class="font-mono font-bold">22 mm</span>
+                        </li>
+                        <li class="flex justify-between border-b pb-2">
+                            <span class="text-slate-500">Altura de Torres</span>
+                            <span class="font-mono font-bold">550 mm</span>
+                        </li>
+                        <li class="flex justify-between border-b pb-2">
+                            <span class="text-slate-500">Diámetro Polea Motor</span>
+                            <span class="font-mono font-bold">90 mm</span>
+                        </li>
+                    </ul>
+                    <div class="mt-6 p-4 bg-blueprint rounded-lg border border-slate-300 text-xs text-slate-600 italic">
+                        *Nota: El cartón corrugado tiene un sentido de fibra. Corta las rampas a favor de la fibra para que no se doblen con el tiempo.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 2: CONSTRUCCIÓN DETALLADA -->
+        <div id="tab-build" class="tab-content hidden animate-fade-in">
+            <header class="mb-8">
+                <h2 class="text-3xl font-bold text-slate-900">Guía de Montaje Paso a Paso</h2>
+                <div class="flex items-center mt-2">
+                    <div class="progress-bar flex-grow">
+                        <div id="build-progress" class="progress-fill"></div>
+                    </div>
+                    <span id="progress-text" class="ml-4 text-sm font-bold text-amber-600">0%</span>
+                </div>
+            </header>
+
+            <div class="space-y-6" id="detailed-steps">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+
+        <!-- SECTION 3: LABORATORIO DE FÍSICA -->
+        <div id="tab-physics" class="tab-content hidden animate-fade-in">
+            <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+                <h2 class="text-2xl font-bold mb-6">Analizador de Pendientes y Fricción</h2>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                    <div>
+                        <p class="text-slate-600 mb-6 text-sm">
+                            Utiliza este gráfico para entender la relación entre el ángulo de la rampa y la pérdida de control. 
+                            El objetivo es mantener la canica en la zona de "Flujo Laminar".
+                        </p>
+                        <div class="chart-container">
+                            <canvas id="physicsChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="space-y-6">
+                        <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
+                            <label class="block text-sm font-bold text-slate-700 mb-4">Ajustar Inclinación de Prueba</label>
+                            <input type="range" id="physicsSlider" min="0" max="30" value="8" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-amber-600">
+                            <div class="flex justify-between mt-2 font-mono text-lg text-amber-600">
+                                <span id="currentAngle">8°</span>
+                                <span id="angleStatus" class="text-sm font-sans uppercase">Óptimo</span>
+                            </div>
+                        </div>
+                        <div id="physics-feedback" class="p-4 rounded-lg text-sm leading-relaxed">
+                            <!-- JS Dynamic content -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="bg-slate-900 text-white p-8 mt-12">
+        <div class="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center text-sm">
+            <p>&copy; 2024 Proyecto MarbleMaster - Ingeniería en Cartón</p>
+            <div class="flex space-x-4 mt-4 md:mt-0">
+                <span>Versión: 2.5.1</span>
+                <span>•</span>
+                <span>Documentación de Código Abierto</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // --- DATA DE MATERIALES ---
+        const materials = [
+            { id: 1, name: "Base de cartón doble (60x45cm)", completed: false },
+            { id: 2, name: "4 Columnas de soporte (55cm)", completed: false },
+            { id: 3, name: "Motorreductor 6V + Portapilas", completed: false },
+            { id: 4, name: "Cinta de cartón/tela para elevador", completed: false },
+            { id: 5, name: "10 Canicas de vidrio (16mm)", completed: false },
+            { id: 6, name: "Pistola de silicona + 20 barras", completed: false }
+        ];
+
+        // --- DATA DE CONSTRUCCIÓN (MÁS EXTENSA) ---
+        const steps = [
+            {
+                title: "Fase 1: La Cimentación y Torres de Carga",
+                desc: "Antes de cualquier rampa, necesitamos un chasis sólido. Sin rigidez, las rampas se desalinearán.",
+                substeps: [
+                    "<strong>Refuerzo de Base:</strong> Pega dos planchas de 60x45cm cruzando la dirección de la fibra para evitar que se curve con el peso.",
+                    "<strong>Anclaje de Torres:</strong> Corta 4 perfiles en 'L' de cartón de 50cm. Pégalos en las esquinas interiores de la base usando escuadras de cartón para asegurar un ángulo de 90° exacto.",
+                    "<strong>Marcado de Niveles:</strong> Usa un nivel de burbuja o regla para marcar líneas cada 5cm en las torres. Esto facilitará el pegado de rampas más tarde."
+                ],
+                tip: "Usa cinta de carrocero para sujetar las torres mientras la silicona se enfría totalmente."
+            },
+            {
+                title: "Fase 2: El Sistema de Elevación Continua",
+                desc: "El corazón de la máquina. Un elevador tipo 'cangilones' que devuelve las canicas a la cima.",
+                substeps: [
+                    "<strong>Fabricación de Poleas:</strong> Corta 6 discos de 8cm de diámetro. Pega 3 para cada polea (superior e inferior) para crear un canal central que guíe la cinta.",
+                    "<strong>Instalación del Motor:</strong> Monta el motor en la parte inferior. El eje debe atravesar la polea inferior. Asegura el motor con una abrazadera de cartón y tornillos pequeños.",
+                    "<strong>La Cinta Transportadora:</strong> Usa una tira de cartulina rígida de 3cm de ancho. Pega pequeños 'asientos' (trozos de tubo o cajas de 2x2cm) cada 10cm.",
+                    "<strong>Tensión:</strong> La polea superior debe ser móvil (ranura de ajuste) para poder tensar la cinta y evitar que patine."
+                ],
+                tip: "Añade una goma elástica alrededor de las poleas para aumentar la fricción con la cinta."
+            },
+            {
+                title: "Fase 3: Ingeniería de Rampas y Curvas",
+                desc: "Donde la gravedad se convierte en movimiento. La geometría aquí es crítica.",
+                substeps: [
+                    "<strong>Pistas Rectas:</strong> Tiras de 4cm de ancho. Dobla 1cm a cada lado (usa un cúter sin presionar para marcar el doblez). El canal central debe ser de 22mm exactos.",
+                    "<strong>Curvas de Retorno:</strong> Corta formas de 'C' en cartón. Pega una tira flexible de cartulina fina en el borde exterior para crear una pared curva de 2cm de alto.",
+                    "<strong>Cálculo de Inclinación:</strong> Por cada 20cm de largo, la rampa debe bajar 2cm (Pendiente del 10%)."
+                ],
+                tip: "Lija los bordes donde se unen las rampas. Un escalón de 1mm puede detener una canica."
+            },
+            {
+                title: "Fase 4: El Módulo de Descenso Complejo",
+                desc: "Añadiremos elementos visuales y auditivos al recorrido.",
+                substeps: [
+                    "<strong>El Embudo:</strong> Crea un cono de cartón con un agujero de 30mm en el centro. Las canicas girarán en espiral antes de caer.",
+                    "<strong>El Xilófono de Cartón:</strong> Corta pequeñas tiras de madera o cartón extra duro y colócalas como escalones para que la canica haga ruido al bajar.",
+                    "<strong>El Zig-Zag:</strong> Monta 4 rampas cortas (10cm) en ángulos opuestos con una caída pronunciada para crear un movimiento errático."
+                ],
+                tip: "Asegura que el embudo esté perfectamente nivelado para que la espiral sea simétrica."
+            },
+            {
+                title: "Fase 5: Circuito de Retorno y Alimentación",
+                desc: "El cierre del bucle. La canica debe volver sola al elevador.",
+                substeps: [
+                    "<strong>Trampa de Captura:</strong> Crea una caja ancha al final del recorrido que canalice todas las canicas hacia la base del elevador.",
+                    "<strong>Alineación de Carga:</strong> La rampa final debe entregar la canica justo en el momento en que un 'cangilón' del elevador pasa por debajo.",
+                    "<strong>Protecciones laterales:</strong> Añade paredes extra altas en la zona de recepción para evitar rebotes fuera de la máquina."
+                ],
+                tip: "Prueba esta sección dejando caer 5 canicas a la vez para ver si hay atascos en el cuello de botella."
+            },
+            {
+                title: "Fase 6: Calibración y Troubleshooting",
+                desc: "Ajuste fino de la velocidad y fiabilidad.",
+                substeps: [
+                    "<strong>Prueba de Resistencia:</strong> Deja la máquina funcionando 15 minutos seguidos. Observa dónde se producen los fallos.",
+                    "<strong>Regulación de Voltaje:</strong> Si el motor va muy rápido, las canicas saltarán. Usa pilas medio gastadas o un potenciómetro para reducir la velocidad.",
+                    "<strong>Sellado Final:</strong> Una vez todo funcione, refuerza todas las uniones con una segunda capa de silicona fría o cola blanca."
+                ],
+                tip: "Usa grafito de un lápiz en los ejes de las poleas para que giren con menos fricción."
+            }
+        ];
+
+        // --- LÓGICA DE NAVEGACIÓN ---
+        function switchTab(id) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+            
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active-nav'));
+            event.currentTarget.classList.add('active-nav');
+        }
+
+        // --- LÓGICA DE INVENTARIO ---
+        function renderMaterials() {
+            const container = document.getElementById('mat-checklist');
+            container.innerHTML = '';
+            materials.forEach(m => {
+                const div = document.createElement('div');
+                div.className = "flex items-center p-2 hover:bg-slate-50 rounded transition-colors cursor-pointer";
+                div.onclick = () => {
+                    m.completed = !m.completed;
+                    renderMaterials();
+                };
+                div.innerHTML = `
+                    <div class="w-6 h-6 border-2 rounded mr-3 flex items-center justify-center ${m.completed ? 'bg-amber-500 border-amber-500' : 'border-slate-300'}">
+                        ${m.completed ? '<span class="text-white text-xs">✓</span>' : ''}
+                    </div>
+                    <span class="text-sm ${m.completed ? 'line-through text-slate-400' : 'text-slate-700'}">${m.name}</span>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // --- LÓGICA DE PASOS DETALLADOS ---
+        let completedSteps = new Set();
+        function renderSteps() {
+            const container = document.getElementById('detailed-steps');
+            container.innerHTML = '';
+            steps.forEach((s, i) => {
+                const div = document.createElement('div');
+                div.className = "bg-white p-6 rounded-xl shadow-sm border border-slate-200 step-card";
+                div.innerHTML = `
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-xl font-bold text-slate-800">${s.title}</h3>
+                        <input type="checkbox" onchange="toggleStepProgress(${i})" class="w-5 h-5 accent-amber-600">
+                    </div>
+                    <p class="text-slate-600 mb-4 text-sm font-medium">${s.desc}</p>
+                    <ul class="space-y-3 mb-6">
+                        ${s.substeps.map(ss => `<li class="text-sm text-slate-700 flex items-start"><span class="text-amber-500 mr-2">•</span> <div>${ss}</div></li>`).join('')}
+                    </ul>
+                    <div class="bg-blue-50 p-3 rounded border border-blue-100 text-xs text-blue-800">
+                        <strong>💡 Consejo Pro:</strong> ${s.tip}
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function toggleStepProgress(index) {
+            if(completedSteps.has(index)) completedSteps.delete(index);
+            else completedSteps.add(index);
+            
+            const progress = (completedSteps.size / steps.length) * 100;
+            document.getElementById('build-progress').style.width = progress + '%';
+            document.getElementById('progress-text').innerText = Math.round(progress) + '%';
+        }
+
+        // --- LÓGICA DE FÍSICA (CHART.JS) ---
+        let chart;
+        function initPhysics() {
+            const ctx = document.getElementById('physicsChart').getContext('2d');
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [0, 5, 10, 15, 20, 25, 30],
+                    datasets: [{
+                        label: 'Estabilidad del Recorrido (%)',
+                        data: [0, 80, 100, 85, 60, 30, 5],
+                        borderColor: '#d97706',
+                        backgroundColor: 'rgba(217, 119, 6, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, max: 100 },
+                        x: { title: { display: true, text: 'Ángulo de Inclinación (°)' } }
+                    }
+                }
+            });
+
+            const slider = document.getElementById('physicsSlider');
+            slider.oninput = function() {
+                const val = this.value;
+                document.getElementById('currentAngle').innerText = val + '°';
+                updatePhysicsFeedback(val);
+            };
+            updatePhysicsFeedback(8);
+        }
+
+        function updatePhysicsFeedback(angle) {
+            const fb = document.getElementById('physics-feedback');
+            const status = document.getElementById('angleStatus');
+            
+            if(angle < 5) {
+                status.innerText = "Insuficiente";
+                status.className = "text-sm font-sans uppercase text-red-500";
+                fb.className = "p-4 rounded-lg bg-red-50 text-red-800 border border-red-200 text-sm";
+                fb.innerHTML = "<strong>Fallo:</strong> La canica se detendrá debido a la fricción superficial del cartón. Necesitas al menos 5 grados.";
+            } else if(angle <= 12) {
+                status.innerText = "Óptimo";
+                status.className = "text-sm font-sans uppercase text-green-600 font-bold";
+                fb.className = "p-4 rounded-lg bg-green-50 text-green-800 border border-green-200 text-sm";
+                fb.innerHTML = "<strong>Éxito:</strong> Flujo perfecto. La energía cinética compensa la fricción sin perder contacto con la pista.";
+            } else {
+                status.innerText = "Crítico";
+                status.className = "text-sm font-sans uppercase text-amber-600";
+                fb.className = "p-4 rounded-lg bg-amber-50 text-amber-800 border border-amber-200 text-sm";
+                fb.innerHTML = "<strong>Advertencia:</strong> Demasiada velocidad. La canica rebotará en las paredes y probablemente saltará fuera en la próxima curva.";
+            }
+        }
+
+        // --- INICIO ---
+        window.onload = () => {
+            renderMaterials();
+            renderSteps();
+            initPhysics();
+        };
+    </script>
+</body>
+</html>
