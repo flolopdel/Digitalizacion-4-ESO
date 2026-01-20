@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sesión Didáctica: IA vs Edición Tradicional</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Custom Chart Container Styles as per requirements */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        
+        /* Smooth transitions */
+        .transition-all-300 {
+            transition: all 0.3s ease-in-out;
+        }
+
+        /* Hide scrollbar for clean horizontal scrolling if needed */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+    <!-- Chosen Palette: Warm Neutrals (Stone/Amber) - Minimalistic and academic tone. 
+         Background: Stone-50. Surface: White. Text: Stone-800. Accent: Amber-600/Stone-500. -->
+    
+    <!-- Application Structure Plan: 
+         1. Dashboard Header: Sets the context (Title, Objective, Total Duration).
+         2. "Fundamentos" (Concepts): Split view comparison cards for GIMP vs AI and File Formats. Allows quick mental model formation.
+         3. "Laboratorio Comparativo" (Comparison): The core interactive element. A tabbed interface allowing users to select an 'Effect' (e.g., Remove BG) and see the direct contrast between the Manual (GIMP) and AI method. This highlights the efficiency gap.
+         4. "Cronograma de la Sesión" (Timeline): A Donut chart visualizing the 60-minute breakdown, ensuring the instructor understands the time management.
+         5. "Guía de Tarea 4.3" (Practice): An interactive step-by-step checklist wizard for the student exercise, ensuring all delivery requirements are met. 
+         Rationale: This structure breaks the dense text into actionable sections: Theory -> Comparison -> Time Management -> Execution. -->
+
+    <!-- Visualization & Content Choices:
+         1. Concept Cards (HTML/Tailwind): Text-heavy definitions need readability. Used grid layout with icons.
+         2. Comparison Tabs (JS/DOM): Goal is 'Compare'. Clicking a tab updates the content area instantly to contrast methods. No SVG used.
+         3. Timeline Donut Chart (Chart.js): Goal is 'Inform/Organize'. Shows the proportion of time (Theory vs Demo vs Practice).
+         4. Task Wizard (HTML/JS): Goal is 'Change/Process'. A checklist approach to the Tarea 4.3 instructions to ensure completion.
+         CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="bg-stone-50 text-stone-800 font-sans leading-relaxed selection:bg-amber-100 selection:text-amber-900">
+
+    <!-- Navigation / Header -->
+    <header class="bg-white shadow-sm border-b border-stone-200 sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <span class="text-2xl">🎓</span>
+                <h1 class="font-bold text-lg sm:text-xl text-stone-900 tracking-tight">Sesión Didáctica: Revolución en la Imagen</h1>
+            </div>
+            <nav class="hidden md:flex gap-6 text-sm font-medium text-stone-600">
+                <button onclick="scrollToSection('fundamentos')" class="hover:text-amber-600 transition-colors">Fundamentos</button>
+                <button onclick="scrollToSection('comparativa')" class="hover:text-amber-600 transition-colors">Comparativa</button>
+                <button onclick="scrollToSection('cronograma')" class="hover:text-amber-600 transition-colors">Tiempos</button>
+                <button onclick="scrollToSection('tarea')" class="hover:text-amber-600 transition-colors">Tarea 4.3</button>
+            </nav>
+            <div class="md:hidden">
+                <!-- Mobile menu button placeholder (simplified for single file) -->
+                <button onclick="scrollToSection('tarea')" class="text-amber-600 font-bold text-sm">Ir a Tarea</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
+
+        <!-- Intro Section -->
+        <section class="text-center space-y-4 max-w-3xl mx-auto">
+            <h2 class="text-3xl md:text-4xl font-extrabold text-stone-900">IA Generativa vs. Edición Tradicional</h2>
+            <p class="text-stone-600 text-lg">
+                Una guía interactiva de 60 minutos para comprender la transición del píxel al prompt.
+                Domina los formatos y herramientas online.
+            </p>
+            <div class="inline-flex items-center bg-amber-50 border border-amber-200 rounded-full px-4 py-1 text-sm text-amber-800">
+                <span>⏱️ Duración Total: 60 minutos</span>
+            </div>
+        </section>
+
+        <!-- SECTION 1: CONCEPTS & FORMATS -->
+        <section id="fundamentos" class="scroll-mt-20">
+            <div class="border-l-4 border-amber-500 pl-4 mb-6">
+                <h3 class="text-2xl font-bold text-stone-900">1. Fundamentos y Conceptos Clave</h3>
+                <p class="text-stone-500 mt-1">
+                    Antes de editar, debemos entender la herramienta y el material. Aquí exploramos la diferencia fundamental entre manipular píxeles y generar contenido, así como los formatos de archivo esenciales.
+                </p>
+            </div>
+
+            <!-- Concepts Grid -->
+            <div class="grid md:grid-cols-2 gap-6 mb-8">
+                <!-- GIMP Card -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200 hover:border-stone-300 transition-all-300">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 bg-stone-100 rounded-full flex items-center justify-center text-xl">🖌️</div>
+                        <h4 class="font-bold text-xl text-stone-800">GIMP (Tradicional)</h4>
+                    </div>
+                    <ul class="space-y-3 text-stone-600">
+                        <li class="flex items-start gap-2">
+                            <span class="text-amber-600 mt-1">▪</span>
+                            <span>Basado en la <strong>manipulación directa de píxeles</strong>.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-amber-600 mt-1">▪</span>
+                            <span>Requiere conocimientos técnicos: selección, pinceles, máscaras.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-amber-600 mt-1">▪</span>
+                            <span>Proceso manual y a menudo "destructivo".</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- AI Card -->
+                <div class="bg-gradient-to-br from-white to-amber-50/50 p-6 rounded-xl shadow-sm border border-stone-200 hover:border-amber-300 transition-all-300">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center text-xl">🤖</div>
+                        <h4 class="font-bold text-xl text-stone-800">IA (Generativa)</h4>
+                    </div>
+                    <ul class="space-y-3 text-stone-600">
+                        <li class="flex items-start gap-2">
+                            <span class="text-amber-600 mt-1">▪</span>
+                            <span>No mueve píxeles, <strong>predice</strong> nuevos contenidos.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-amber-600 mt-1">▪</span>
+                            <span>Se basa en el <strong>lenguaje natural (Prompts)</strong>.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-amber-600 mt-1">▪</span>
+                            <span>Entiende el contexto semántico (fondo, pelo, objeto).</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Formats Mini-Section -->
+            <div class="bg-white rounded-xl border border-stone-200 p-6">
+                <h4 class="font-bold text-lg text-stone-900 mb-4 border-b border-stone-100 pb-2">Formatos de Imagen: ¿Qué estamos editando?</h4>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h5 class="text-sm font-semibold text-stone-500 uppercase tracking-wide mb-3">Raster (Mapas de bits)</h5>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between p-3 bg-stone-50 rounded-lg">
+                                <span class="font-medium">JPG</span>
+                                <span class="text-sm text-stone-500">Compresión alta, web, sin transparencia.</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-stone-50 rounded-lg">
+                                <span class="font-medium">PNG</span>
+                                <span class="text-sm text-stone-500">Admite transparencias (Vital para recortes).</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-stone-50 rounded-lg">
+                                <span class="font-medium">WebP</span>
+                                <span class="text-sm text-stone-500">Estándar moderno, alta calidad, bajo peso.</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h5 class="text-sm font-semibold text-stone-500 uppercase tracking-wide mb-3">Proyectos Editables</h5>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between p-3 bg-stone-50 rounded-lg border-l-4 border-stone-400">
+                                <span class="font-medium">XCF</span>
+                                <span class="text-sm text-stone-500">Nativo de GIMP. Guarda capas.</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-stone-50 rounded-lg border-l-4 border-blue-400">
+                                <span class="font-medium">PSD</span>
+                                <span class="text-sm text-stone-500">Estándar (Photoshop/Photopea). Compatible con IA.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: COMPARISON LAB -->
+        <section id="comparativa" class="scroll-mt-20">
+            <div class="border-l-4 border-amber-500 pl-4 mb-6">
+                <h3 class="text-2xl font-bold text-stone-900">2. Laboratorio Comparativo</h3>
+                <p class="text-stone-500 mt-1">
+                    Analiza cómo las tareas comunes han evolucionado. Selecciona un efecto abajo para ver la diferencia radical en flujo de trabajo y tiempo.
+                </p>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-stone-200 overflow-hidden">
+                <!-- Tabs -->
+                <div class="flex overflow-x-auto no-scrollbar border-b border-stone-200 bg-stone-50">
+                    <button onclick="updateComparison('borrar')" class="tab-btn active px-6 py-4 font-medium text-sm whitespace-nowrap border-b-2 border-amber-600 text-amber-800 focus:outline-none hover:bg-stone-100" id="btn-borrar">Borrar Fondo</button>
+                    <button onclick="updateComparison('cambiar')" class="tab-btn px-6 py-4 font-medium text-sm whitespace-nowrap border-b-2 border-transparent text-stone-600 focus:outline-none hover:bg-stone-100" id="btn-cambiar">Cambiar Fondo</button>
+                    <button onclick="updateComparison('pelo')" class="tab-btn px-6 py-4 font-medium text-sm whitespace-nowrap border-b-2 border-transparent text-stone-600 focus:outline-none hover:bg-stone-100" id="btn-pelo">Cambiar Color Pelo</button>
+                    <button onclick="updateComparison('eliminar')" class="tab-btn px-6 py-4 font-medium text-sm whitespace-nowrap border-b-2 border-transparent text-stone-600 focus:outline-none hover:bg-stone-100" id="btn-eliminar">Eliminar Objetos</button>
+                </div>
+
+                <!-- Content Display -->
+                <div class="p-6 md:p-8 grid md:grid-cols-2 gap-8 items-center" id="comparison-content">
+                    <!-- Dynamic content injected by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: TIMELINE CHART -->
+        <section id="cronograma" class="scroll-mt-20">
+             <div class="border-l-4 border-amber-500 pl-4 mb-6">
+                <h3 class="text-2xl font-bold text-stone-900">3. Cronograma de la Sesión</h3>
+                <p class="text-stone-500 mt-1">
+                    Distribución de los 60 minutos de clase. Es crucial respetar el tiempo de práctica autónoma.
+                </p>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-6 flex flex-col items-center">
+                <div class="chart-container">
+                    <canvas id="timeChart"></canvas>
+                </div>
+                <div class="mt-6 grid grid-cols-3 gap-4 w-full max-w-lg text-center">
+                    <div class="p-2 rounded bg-stone-50">
+                        <div class="text-lg font-bold text-stone-700">15m</div>
+                        <div class="text-xs text-stone-500">Teoría</div>
+                    </div>
+                    <div class="p-2 rounded bg-stone-50">
+                        <div class="text-lg font-bold text-stone-700">15m</div>
+                        <div class="text-xs text-stone-500">Demo</div>
+                    </div>
+                    <div class="p-2 rounded bg-amber-50 border border-amber-100">
+                        <div class="text-lg font-bold text-amber-700">30m</div>
+                        <div class="text-xs text-amber-600">Práctica</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: TASK GUIDE -->
+        <section id="tarea" class="scroll-mt-20 pb-20">
+            <div class="border-l-4 border-amber-500 pl-4 mb-6 flex justify-between items-end">
+                <div>
+                    <h3 class="text-2xl font-bold text-stone-900">4. Guía Tarea 4.3</h3>
+                    <p class="text-stone-500 mt-1">
+                        Instrucciones paso a paso para el alumno.
+                    </p>
+                </div>
+                <div class="hidden sm:block">
+                     <span class="bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full">30 Minutos</span>
+                </div>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-8">
+                <!-- Tools Column -->
+                <div class="lg:col-span-1 space-y-4">
+                    <h4 class="font-bold text-stone-800">Herramientas Recomendadas</h4>
+                    
+                    <div class="group bg-white p-4 rounded-lg border border-stone-200 hover:shadow-md transition cursor-pointer">
+                        <h5 class="font-bold text-stone-900 flex justify-between">Photopea <span class="text-stone-300">↗</span></h5>
+                        <p class="text-sm text-stone-600 mt-2">Similar a Photoshop. Usa "Magic Replace" o "Generative Fill". Gratuito con anuncios.</p>
+                    </div>
+
+                    <div class="group bg-white p-4 rounded-lg border border-stone-200 hover:shadow-md transition cursor-pointer">
+                        <h5 class="font-bold text-stone-900 flex justify-between">Canva <span class="text-stone-300">↗</span></h5>
+                        <p class="text-sm text-stone-600 mt-2">Muy popular. Usa "Estudio Mágico" para editar fotos y eliminar fondos.</p>
+                    </div>
+
+                    <div class="group bg-white p-4 rounded-lg border border-stone-200 hover:shadow-md transition cursor-pointer">
+                        <h5 class="font-bold text-stone-900 flex justify-between">Pixlr <span class="text-stone-300">↗</span></h5>
+                        <p class="text-sm text-stone-600 mt-2">Herramienta rápida. Prueba la función "Generative Transform".</p>
+                    </div>
+
+                    <div class="bg-stone-100 p-4 rounded-lg border border-stone-200">
+                        <h5 class="font-bold text-stone-700 mb-1">Otros:</h5>
+                        <ul class="text-sm text-stone-600 list-disc list-inside">
+                            <li>Zoner AI Editor</li>
+                            <li>SnapEdit.App</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Steps Column -->
+                <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-stone-200 p-6">
+                    <h4 class="font-bold text-stone-900 mb-6 border-b pb-2">Lista de Verificación de Entrega</h4>
+                    
+                    <div class="space-y-6">
+                        <!-- Step 1 -->
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0 w-8 h-8 bg-stone-200 rounded-full flex items-center justify-center font-bold text-stone-600">1</div>
+                            <div>
+                                <h5 class="font-bold text-stone-800">Replicar Prácticas</h5>
+                                <p class="text-sm text-stone-600">Realiza las 4 prácticas de la Tarea 4.2 (originalmente manuales) usando ahora las herramientas de IA.</p>
+                            </div>
+                        </div>
+
+                        <!-- Step 2 -->
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0 w-8 h-8 bg-stone-200 rounded-full flex items-center justify-center font-bold text-stone-600">2</div>
+                            <div>
+                                <h5 class="font-bold text-stone-800">Organizar Archivos</h5>
+                                <p class="text-sm text-stone-600">Crea una carpeta en Google Drive llamada <code class="bg-stone-100 px-1 rounded text-amber-700">tarea 4.3</code>. Sube los archivos con nombres claros (ej: <em>practica1_IA.png</em>).</p>
+                            </div>
+                        </div>
+
+                        <!-- Step 3 -->
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0 w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center font-bold text-amber-700">3</div>
+                            <div class="w-full">
+                                <h5 class="font-bold text-stone-800">Compartir Carpeta</h5>
+                                <div class="bg-stone-50 p-3 mt-2 rounded border border-stone-200 text-sm">
+                                    <p class="mb-1">📧 Compartir con:</p>
+                                    <div class="flex items-center justify-between bg-white border border-stone-300 rounded px-2 py-1">
+                                        <code class="text-stone-800 select-all" id="email-to-copy">flopdel364@g.educaand.es</code>
+                                        <button onclick="copyEmail()" class="text-xs text-amber-600 font-bold hover:underline">Copiar</button>
+                                    </div>
+                                    <p class="text-xs text-stone-500 mt-2">* Si trabajas en pareja, compártela también con ella.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 4 -->
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0 w-8 h-8 bg-stone-200 rounded-full flex items-center justify-center font-bold text-stone-600">4</div>
+                            <div>
+                                <h5 class="font-bold text-stone-800">Entrega Final</h5>
+                                <p class="text-sm text-stone-600">Pega el enlace de la carpeta (acceso público o compartido) en los comentarios de la plataforma.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-stone-100 border-t border-stone-200 py-8 text-center text-sm text-stone-500">
+        <p>Generado para la sesión didáctica sobre IA e Imagen.</p>
+    </footer>
+
+    <!-- JavaScript Implementation -->
+    <script>
+        // --- 1. State & Data ---
+
+        // Comparison Data: Differences between GIMP and AI for specific effects
+        const comparisonData = {
+            'borrar': {
+                title: 'Borrar Fondo',
+                traditional: {
+                    time: '5-10 min',
+                    method: 'Herramienta de rutas o Tijeras inteligentes. Proceso minucioso de selección borde a borde.',
+                    color: 'bg-stone-100'
+                },
+                ai: {
+                    time: '3 segundos',
+                    method: 'Botón "Magic Remover" o "Remove BG". Detección automática del sujeto principal.',
+                    color: 'bg-amber-50'
+                }
+            },
+            'cambiar': {
+                title: 'Cambiar Fondo',
+                traditional: {
+                    time: '10-15 min',
+                    method: 'Crear máscaras complejas, ajustar bordes ("refine edge"), igualar iluminación y pegar en capa inferior.',
+                    color: 'bg-stone-100'
+                },
+                ai: {
+                    time: '1 minuto',
+                    method: 'Prompt: "In a forest at night" usando Relleno Generativo. La IA integra luces y sombras automáticamente.',
+                    color: 'bg-amber-50'
+                }
+            },
+            'pelo': {
+                title: 'Cambiar Color de Pelo',
+                traditional: {
+                    time: '5-10 min',
+                    method: 'Selección manual por rango de color, crear capa de ajuste de Tono/Saturación, usar máscara para perfeccionar cabellos sueltos.',
+                    color: 'bg-stone-100'
+                },
+                ai: {
+                    time: 'Instantáneo',
+                    method: 'Pincel de IA sobre el pelo + Prompt: "Blonde hair". La IA entiende la textura del cabello.',
+                    color: 'bg-amber-50'
+                }
+            },
+            'eliminar': {
+                title: 'Eliminar Objetos',
+                traditional: {
+                    time: 'Variable',
+                    method: 'Herramienta de clonado o saneado. Requiere copiar texturas vecinas manualmente para tapar el hueco.',
+                    color: 'bg-stone-100'
+                },
+                ai: {
+                    time: 'Rápido',
+                    method: 'IA Inpainting. Simplemente borras el objeto y la IA "inventa" (predice) lo que debería haber detrás basándose en el contexto.',
+                    color: 'bg-amber-50'
+                }
+            }
+        };
+
+        // --- 2. Chart.js Initialization ---
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            initChart();
+            updateComparison('borrar'); // Initial load
+        });
+
+        function initChart() {
+            const ctx = document.getElementById('timeChart').getContext('2d');
+            
+            // Data derived from "Resumen de Tiempos"
+            const data = {
+                labels: ['Explicación Teórica (15m)', 'Comparativa/Demo (15m)', 'Práctica Autónoma (30m)'],
+                datasets: [{
+                    data: [15, 15, 30],
+                    backgroundColor: [
+                        '#d6d3d1', // stone-300
+                        '#a8a29e', // stone-400
+                        '#d97706'  // amber-600 (Focus area)
+                    ],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            };
+
+            const config = {
+                type: 'doughnut',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '60%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: { family: 'ui-sans-serif, system-ui, sans-serif' },
+                                color: '#44403c'
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return ` ${context.label}`;
+                                }
+                            },
+                            backgroundColor: '#fff',
+                            titleColor: '#1c1917',
+                            bodyColor: '#44403c',
+                            borderColor: '#e7e5e4',
+                            borderWidth: 1,
+                            padding: 10
+                        }
+                    }
+                }
+            };
+
+            new Chart(ctx, config);
+        }
+
+        // --- 3. Interaction Logic ---
+
+        function updateComparison(effectKey) {
+            const data = comparisonData[effectKey];
+            const contentDiv = document.getElementById('comparison-content');
+            
+            // Update Tab Styling
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('border-amber-600', 'text-amber-800');
+                btn.classList.add('border-transparent', 'text-stone-600');
+            });
+            const activeBtn = document.getElementById(`btn-${effectKey}`);
+            activeBtn.classList.remove('border-transparent', 'text-stone-600');
+            activeBtn.classList.add('border-amber-600', 'text-amber-800');
+
+            // Render Content
+            contentDiv.innerHTML = `
+                <!-- Traditional Side -->
+                <div class="space-y-4">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-xl">🖌️</span>
+                        <h4 class="font-bold text-stone-700">Método Tradicional (GIMP)</h4>
+                    </div>
+                    <div class="p-4 rounded-lg border border-stone-200 bg-stone-50 h-full">
+                        <div class="flex items-center gap-2 text-stone-500 text-sm font-mono mb-3">
+                            <span class="inline-block w-2 h-2 rounded-full bg-stone-400"></span>
+                            Tiempo: ${data.traditional.time}
+                        </div>
+                        <p class="text-stone-700 leading-relaxed">${data.traditional.method}</p>
+                    </div>
+                </div>
+
+                <!-- Arrow / Divider for Mobile -->
+                <div class="md:hidden flex justify-center text-stone-300">
+                    <span>▼</span>
+                </div>
+
+                <!-- AI Side -->
+                <div class="space-y-4">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-xl">✨</span>
+                        <h4 class="font-bold text-amber-700">Método IA</h4>
+                    </div>
+                    <div class="p-4 rounded-lg border border-amber-200 bg-amber-50 h-full relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-16 h-16 bg-amber-100 rounded-bl-full -mr-8 -mt-8 opacity-50"></div>
+                        <div class="flex items-center gap-2 text-amber-700 text-sm font-mono mb-3 font-bold">
+                            <span class="inline-block w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                            Tiempo: ${data.ai.time}
+                        </div>
+                        <p class="text-stone-800 leading-relaxed relative z-10">${data.ai.method}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function copyEmail() {
+            const emailText = document.getElementById('email-to-copy').innerText;
+            navigator.clipboard.writeText(emailText).then(() => {
+                alert('Correo copiado al portapapeles: ' + emailText);
+            }).catch(err => {
+                console.error('Error al copiar: ', err);
+            });
+        }
+
+    </script>
+</body>
+</html>
