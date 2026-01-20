@@ -67,7 +67,6 @@
             <nav class="hidden md:flex gap-6 text-sm font-medium text-stone-600">
                 <button onclick="scrollToSection('fundamentos')" class="hover:text-amber-600 transition-colors">Fundamentos</button>
                 <button onclick="scrollToSection('comparativa')" class="hover:text-amber-600 transition-colors">Comparativa</button>
-                <button onclick="scrollToSection('cronograma')" class="hover:text-amber-600 transition-colors">Tiempos</button>
                 <button onclick="scrollToSection('tarea')" class="hover:text-amber-600 transition-colors">Tarea 4.3</button>
             </nav>
             <div class="md:hidden">
@@ -206,36 +205,6 @@
                 <!-- Content Display -->
                 <div class="p-6 md:p-8 grid md:grid-cols-2 gap-8 items-center" id="comparison-content">
                     <!-- Dynamic content injected by JS -->
-                </div>
-            </div>
-        </section>
-
-        <!-- SECTION 3: TIMELINE CHART -->
-        <section id="cronograma" class="scroll-mt-20">
-             <div class="border-l-4 border-amber-500 pl-4 mb-6">
-                <h3 class="text-2xl font-bold text-stone-900">3. Cronograma de la Sesión</h3>
-                <p class="text-stone-500 mt-1">
-                    Distribución de los 60 minutos de clase. Es crucial respetar el tiempo de práctica autónoma.
-                </p>
-            </div>
-            
-            <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-6 flex flex-col items-center">
-                <div class="chart-container">
-                    <canvas id="timeChart"></canvas>
-                </div>
-                <div class="mt-6 grid grid-cols-3 gap-4 w-full max-w-lg text-center">
-                    <div class="p-2 rounded bg-stone-50">
-                        <div class="text-lg font-bold text-stone-700">15m</div>
-                        <div class="text-xs text-stone-500">Teoría</div>
-                    </div>
-                    <div class="p-2 rounded bg-stone-50">
-                        <div class="text-lg font-bold text-stone-700">15m</div>
-                        <div class="text-xs text-stone-500">Demo</div>
-                    </div>
-                    <div class="p-2 rounded bg-amber-50 border border-amber-100">
-                        <div class="text-lg font-bold text-amber-700">30m</div>
-                        <div class="text-xs text-amber-600">Práctica</div>
-                    </div>
                 </div>
             </div>
         </section>
