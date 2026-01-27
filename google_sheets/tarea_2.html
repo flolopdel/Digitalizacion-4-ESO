@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Sheets Avanzado: La Función SI</title>
+    <script src="/Digitalizacion-4-ESO/assets/tailwind.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .cell-hover:hover { background-color: #e0f2fe; cursor: crosshair; }
+        .sheet-input { transition: all 0.2s; }
+        .sheet-input:focus { outline: 2px solid #3b82f6; background-color: #fff; }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            height: 300px;
+            max-height: 300px;
+            margin: 0 auto;
+        }
+        .logic-flow { position: relative; }
+        .logic-line { height: 2px; background: #cbd5e1; flex-grow: 1; margin: 0 10px; }
+    </style>
+    <!-- Chosen Palette: Slate & Emerald (Professional & Logic-oriented) -->
+    
+    <!-- Application Structure Plan: 
+         1. Hero: Actualizado para enfoque en "Lógica y Decisiones".
+         2. Conceptos Básicos: (Mantenido) Anatomía de la hoja.
+         3. Módulo Lógica Avanzada: Explicación visual de la función SI.
+         4. Simulador IF: Ejemplo en vivo de cómo cambia un texto según un valor.
+         5. Taller de Economía: (Actualizado) Ahora incluye una columna de "Estado" calculada con SI.
+         Reasoning: El alumno primero entiende el dato, luego cómo la hoja puede "decidir" sobre ese dato.
+    -->
+
+    <!-- Visualization & Content Choices:
+         1. Diagrama de Flujo (HTML/CSS): Para explicar la sintaxis de =SI().
+         2. Card "Cómo piensa Sheets": Comparación entre lenguaje natural y código.
+         3. Columna Dinámica en Tabla: Implementación de =SI en la práctica de economía.
+    -->
+</head>
+<body class="bg-stone-50 text-slate-800 antialiased">
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-stone-200 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between h-16 items-center">
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 bg-blue-600 rounded flex items-center justify-center text-white font-bold">SI</div>
+                <span class="font-bold text-xl tracking-tight text-slate-700">Sheets<span class="text-blue-600">Pro</span></span>
+            </div>
+            <div class="hidden md:flex space-x-6 text-sm font-medium text-slate-500">
+                <button onclick="scrollToSection('conceptos')" class="hover:text-blue-600">Conceptos</button>
+                <button onclick="scrollToSection('logica')" class="hover:text-blue-600">Función SI</button>
+                <button onclick="scrollToSection('practica')" class="hover:text-blue-600 font-bold text-blue-600">Práctica Avanzada</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto px-4 py-12 space-y-24">
+
+        <!-- Hero Section -->
+        <section class="text-center space-y-4">
+            <span class="bg-blue-100 text-blue-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest">Nivel Intermedio</span>
+            <h1 class="text-4xl md:text-5xl font-bold text-slate-900 leading-tight">
+                Haz que tu hoja <br> <span class="text-blue-600">tome decisiones</span>
+            </h1>
+            <p class="text-lg text-slate-600 max-w-2xl mx-auto">
+                Aprende a usar la función <strong>SI</strong> para automatizar alertas, categorías y estados basados en tus datos.
+            </p>
+        </section>
+
+        <!-- Section: Anatomy (Simplified) -->
+        <section id="conceptos" class="scroll-mt-24 bg-white rounded-2xl p-8 border border-stone-100 shadow-sm">
+            <h2 class="text-xl font-bold mb-4">Recordatorio: La Celda es una Caja</h2>
+            <div class="flex flex-col md:flex-row gap-6 items-center">
+                <div class="grid grid-cols-3 gap-2 font-mono text-sm">
+                    <div class="bg-slate-200 p-2"></div><div class="bg-slate-200 p-2">A</div><div class="bg-slate-200 p-2">B</div>
+                    <div class="bg-slate-200 p-2">1</div><div class="bg-blue-50 border border-blue-200 p-4 text-center">150</div><div class="bg-white border border-slate-200 p-4"></div>
+                </div>
+                <div class="flex-1">
+                    <p class="text-slate-600">En la celda <span class="font-bold">A1</span> tenemos el valor <span class="text-blue-600 font-bold">150</span>. La función SI nos permitirá preguntar: <em>"¿Es el contenido de A1 mayor que 100?"</em></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: The IF Function -->
+        <section id="logica" class="scroll-mt-24 space-y-8">
+            <div class="text-center space-y-2">
+                <h2 class="text-3xl font-bold text-slate-900">La Función SI (IF)</h2>
+                <p class="text-slate-600">Es la base de la inteligencia en las hojas de cálculo.</p>
+            </div>
+
+            <!-- Syntax Diagram -->
+            <div class="bg-slate-900 text-white rounded-3xl p-8 shadow-2xl">
+                <h3 class="text-green-400 font-mono mb-6 text-center text-xl">=SI( prueba_lógica ; valor_si_verdadero ; valor_si_falso )</h3>
+                
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
+                        <span class="text-blue-400 font-bold block mb-2">1. La Pregunta</span>
+                        <p class="text-sm text-slate-400">Una comparación usando >, <, =. <br>Ej: <code class="text-white">A1 > 50</code></p>
+                    </div>
+                    <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
+                        <span class="text-emerald-400 font-bold block mb-2">2. Si se cumple</span>
+                        <p class="text-sm text-slate-400">Lo que aparece si es cierto. <br>Ej: <code class="text-white">"OK"</code></p>
+                    </div>
+                    <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
+                        <span class="text-rose-400 font-bold block mb-2">3. Si NO se cumple</span>
+                        <p class="text-sm text-slate-400">Lo que aparece si es falso. <br>Ej: <code class="text-white">"ALERTA"</code></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visual Comparison -->
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                <div class="space-y-4">
+                    <h3 class="text-xl font-bold">¿Cómo lo decimos nosotros?</h3>
+                    <div class="bg-stone-100 p-6 rounded-2xl italic text-slate-700 border-l-4 border-slate-300">
+                        "Si mi balance es menor a 0, pon un aviso de 'DÉFICIT', si no, pon 'SALDO POSITIVO'."
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <h3 class="text-xl font-bold">¿Cómo lo dice Sheets?</h3>
+                    <div class="bg-blue-600 p-6 rounded-2xl font-mono text-white shadow-lg">
+                        =SI( C10 < 0 ; "DÉFICIT" ; "POSITIVO" )
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Practice Simulator -->
+        <section id="practica" class="bg-white rounded-3xl shadow-xl border border-stone-200 overflow-hidden scroll-mt-24">
+            <div class="bg-slate-900 p-8 text-white">
+                <h2 class="text-2xl font-bold flex items-center gap-2">
+                    <span class="text-blue-400">📊</span> Taller Pro: Economía con Alertas
+                </h2>
+                <p class="text-slate-400 text-sm mt-1">Ahora la hoja categorizará tus gastos automáticamente usando la función SI.</p>
+            </div>
+
+            <div class="grid lg:grid-cols-3 divide-y lg:divide-y-0 lg:divide-x divide-stone-200">
+                
+                <div class="lg:col-span-2 p-6 bg-stone-50">
+                    <div class="overflow-x-auto rounded-xl border border-stone-200 bg-white shadow-sm">
+                        <table class="w-full text-sm">
+                            <thead class="bg-stone-100 text-stone-500 font-bold uppercase text-[10px] tracking-wider">
+                                <tr>
+                                    <th class="p-3 border-b border-r w-10">#</th>
+                                    <th class="p-3 border-b border-r">Concepto</th>
+                                    <th class="p-3 border-b border-r w-24 text-right">Importe (€)</th>
+                                    <th class="p-3 border-b text-center bg-blue-50 text-blue-600">Estado (SI)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="spreadsheet-body" class="divide-y divide-stone-100">
+                                <!-- Filas generadas por JS -->
+                            </tbody>
+                            <tfoot class="bg-slate-50 font-bold text-slate-700">
+                                <tr class="border-t-2 border-slate-200">
+                                    <td colspan="2" class="p-4 text-right">TOTAL GASTOS:</td>
+                                    <td class="p-4 text-right" id="total-val">0.00 €</td>
+                                    <td class="p-4 text-center" id="global-status">--</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    <div class="mt-4 flex gap-3">
+                        <button onclick="addRow()" class="bg-white border border-stone-300 px-4 py-2 rounded-lg text-sm font-medium hover:bg-stone-100 transition shadow-sm">+ Añadir Gasto</button>
+                        <div class="flex items-center gap-2 ml-auto text-xs text-slate-400 font-mono">
+                            <span>Lógica: =SI(C>20;"CARO";"OK")</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analysis Panel -->
+                <div class="p-8 bg-white space-y-8">
+                    <div class="text-center">
+                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Presupuesto Utilizado</h3>
+                        <div class="chart-container">
+                            <canvas id="budgetChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="bg-blue-50 p-4 rounded-2xl border border-blue-100">
+                        <h4 class="text-sm font-bold text-blue-800 mb-2 italic">Explicación de la Lógica:</h4>
+                        <p class="text-xs text-blue-600 leading-relaxed">
+                            Hemos configurado la columna azul para que <strong>compare</strong> el importe con 20€. <br><br>
+                            Si el gasto es > 20, la hoja escribe "CARO" y lo pinta en rojo. Si no, escribe "OK" en verde.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-stone-100 border-t border-stone-200 py-12 text-center text-slate-400 text-sm">
+        <p>Guía de Funciones Avanzadas • 4º ESO • Google Sheets</p>
+    </footer>
+
+    <script>
+        let tableData = [
+            { id: 1, concept: 'Suscripción Juegos', amount: 12.99 },
+            { id: 2, concept: 'Zapatillas nuevas', amount: 55.00 },
+            { id: 3, concept: 'Merienda viernes', amount: 8.50 },
+            { id: 4, concept: 'Entrada Concierto', amount: 45.00 }
+        ];
+
+        let myChart = null;
+
+        function renderTable() {
+            const tbody = document.getElementById('spreadsheet-body');
+            tbody.innerHTML = '';
+            let total = 0;
+
+            tableData.forEach((row, index) => {
+                total += row.amount;
+                
+                // Lógica del SI implementada en JS para el simulador
+                const isExpensive = row.amount > 20;
+                const statusText = isExpensive ? 'CARO' : 'OK';
+                const statusClass = isExpensive ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-700';
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="p-3 border-b border-r text-center text-slate-400 font-mono text-xs">${index + 1}</td>
+                    <td class="p-3 border-b border-r">
+                        <input type="text" value="${row.concept}" class="w-full bg-transparent sheet-input outline-none" onchange="updateRow(${row.id}, 'concept', this.value)">
+                    </td>
+                    <td class="p-3 border-b border-r text-right">
+                        <input type="number" value="${row.amount}" class="w-20 bg-transparent sheet-input text-right font-mono" oninput="updateRow(${row.id}, 'amount', this.value)">
+                    </td>
+                    <td class="p-3 border-b text-center">
+                        <span class="px-3 py-1 rounded-full text-[10px] font-bold ${statusClass}">${statusText}</span>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            updateCalculations(total);
+        }
+
+        function updateRow(id, field, value) {
+            const row = tableData.find(r => r.id === id);
+            if (row) {
+                row[field] = field === 'amount' ? (parseFloat(value) || 0) : value;
+                renderTable();
+            }
+        }
+
+        function addRow() {
+            const newId = Date.now();
+            tableData.push({ id: newId, concept: 'Nuevo Gasto', amount: 0 });
+            renderTable();
+        }
+
+        function updateCalculations(total) {
+            document.getElementById('total-val').innerText = total.toFixed(2) + ' €';
+            
+            // Global Status SI
+            const globalEl = document.getElementById('global-status');
+            if (total > 150) {
+                globalEl.innerHTML = '<span class="text-rose-600 font-bold">⚠️ EXCEDIDO</span>';
+            } else {
+                globalEl.innerHTML = '<span class="text-emerald-600 font-bold">✅ DENTRO DEL LÍMITE</span>';
+            }
+
+            if (myChart) {
+                // Simulamos presupuesto de 200€
+                const remaining = Math.max(0, 200 - total);
+                myChart.data.datasets[0].data = [total, remaining];
+                myChart.update();
+            }
+        }
+
+        function initChart() {
+            const ctx = document.getElementById('budgetChart').getContext('2d');
+            myChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Gastado', 'Disponible'],
+                    datasets: [{
+                        data: [0, 200],
+                        backgroundColor: ['#3b82f6', '#e2e8f0'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '80%',
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+        }
+
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        window.onload = () => {
+            initChart();
+            renderTable();
+        };
+    </script>
+</body>
+</html>
