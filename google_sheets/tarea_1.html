@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dominando Google Sheets: Sesión Interactiva</title>
+    <script src="/Digitalizacion-4-ESO/assets/tailwind.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .cell-hover:hover { background-color: #e0f2fe; cursor: crosshair; }
+        .sheet-input { transition: all 0.2s; }
+        .sheet-input:focus { outline: 2px solid #3b82f6; background-color: #fff; }
+        /* Custom scrollbar for table container */
+        .sheet-scroll::-webkit-scrollbar { height: 8px; }
+        .sheet-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            height: 300px;
+            max-height: 300px;
+            margin: 0 auto;
+        }
+    </style>
+    <!-- Chosen Palette: Warm Neutrals & Professional Blue -->
+    <!-- Background: Stone-50 (Warm White) -->
+    <!-- Primary: Blue-600 (Google Sheets Blue-ish) -->
+    <!-- Text: Slate-800 -->
+    <!-- Accents: Emerald-500 (Success/Income), Rose-500 (Expense) -->
+
+    <!-- Application Structure Plan: 
+         1. Hero: Title and Hook.
+         2. Foundation (Grid): Visual interactive grid to understand "Cells".
+         3. Logic (References): Split screen comparison (Value vs Reference).
+         4. Syntax (Functions): Reference cards for formulas.
+         5. Practice (Simulator): HTML Inputs acting as a spreadsheet.
+         6. Analysis (Charts): Live chart linked to Practice data.
+         Reasoning: Moves from abstract definitions to concrete logic, then application, then analysis—mirroring the learning curve of a spreadsheet user.
+    -->
+
+    <!-- Visualization & Content Choices:
+         1. Grid Interaction: HTML Table + JS Hover -> Teaches coordinate system visually.
+         2. Reference Simulator: Input fields + JS Math -> Demonstrates "reactivity" (Source: Section 2).
+         3. Function Cards: Static text cards -> Quick reference for syntax (Source: Section 3).
+         4. Budget Table: Dynamic Inputs -> Implements the "Gestión de mi Economía" activity directly (Source: Section 4).
+         5. Doughnut Chart: Chart.js -> Visualizes the Budget Table results (Source: Section 5).
+         
+         CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
+    -->
+</head>
+<body class="bg-stone-50 text-slate-800 antialiased selection:bg-blue-100 selection:text-blue-900">
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-stone-200 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-green-600 rounded flex items-center justify-center text-white font-bold text-lg">田</div>
+                    <span class="font-bold text-xl tracking-tight text-slate-700">Sheets<span class="text-green-600">Master</span></span>
+                </div>
+                <div class="hidden md:flex space-x-8 text-sm font-medium text-slate-500">
+                    <button onclick="scrollToSection('conceptos')" class="hover:text-green-600 transition">Conceptos</button>
+                    <button onclick="scrollToSection('referencias')" class="hover:text-green-600 transition">Referencias</button>
+                    <button onclick="scrollToSection('practica')" class="hover:text-green-600 transition">Práctica Real</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 py-12 space-y-24">
+
+        <!-- Hero Section -->
+        <section class="text-center space-y-6">
+            <h1 class="text-4xl md:text-5xl font-bold text-slate-900 leading-tight">
+                De la Calculadora al <br> <span class="text-green-600">Sistema Dinámico</span>
+            </h1>
+            <p class="text-lg text-slate-600 max-w-2xl mx-auto">
+                Las hojas de cálculo ya no son solo para contables. Aprende a gestionar datos, automatizar cálculos y visualizar tu economía en segundos.
+            </p>
+            <div class="flex justify-center gap-4">
+                <button onclick="scrollToSection('practica')" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold shadow-lg shadow-green-600/20 transition transform hover:-translate-y-0.5">
+                    Empezar Práctica
+                </button>
+                <button onclick="scrollToSection('conceptos')" class="bg-white border border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-medium hover:bg-stone-50 transition">
+                    Ver Teoría
+                </button>
+            </div>
+        </section>
+
+        <!-- Section 1: Anatomy of a Sheet -->
+        <section id="conceptos" class="scroll-mt-24">
+            <div class="bg-white rounded-2xl p-8 shadow-sm border border-stone-100">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-2">1. Anatomía de una Hoja</h2>
+                    <p class="text-slate-600">
+                        Una hoja de cálculo es una cuadrícula gigante. La intersección de una <strong>Fila</strong> (número) y una <strong>Columna</strong> (letra) crea una <strong>Celda</strong>.
+                    </p>
+                </div>
+
+                <!-- Interactive Grid -->
+                <div class="flex flex-col md:flex-row gap-8 items-center">
+                    <div class="bg-stone-100 p-4 rounded-xl border border-stone-200 shadow-inner">
+                        <!-- Simulated Spreadsheet Grid -->
+                        <div class="grid grid-cols-4 gap-1 text-center font-mono text-sm">
+                            <!-- Header Row -->
+                            <div class="bg-slate-200 p-2 font-bold rounded-tl"></div>
+                            <div class="bg-slate-200 p-2 font-bold">A</div>
+                            <div class="bg-slate-200 p-2 font-bold">B</div>
+                            <div class="bg-slate-200 p-2 font-bold rounded-tr">C</div>
+
+                            <!-- Row 1 -->
+                            <div class="bg-slate-200 p-2 font-bold">1</div>
+                            <div class="bg-white border border-slate-200 p-3 cell-hover" data-addr="A1"></div>
+                            <div class="bg-white border border-slate-200 p-3 cell-hover" data-addr="B1"></div>
+                            <div class="bg-white border border-slate-200 p-3 cell-hover" data-addr="C1"></div>
+
+                            <!-- Row 2 -->
+                            <div class="bg-slate-200 p-2 font-bold">2</div>
+                            <div class="bg-white border border-slate-200 p-3 cell-hover" data-addr="A2"></div>
+                            <div class="bg-white border border-slate-200 p-3 cell-hover" data-addr="B2"></div>
+                            <div class="bg-white border border-slate-200 p-3 cell-hover" data-addr="C2"></div>
+
+                            <!-- Row 3 -->
+                            <div class="bg-slate-200 p-2 font-bold rounded-bl">3</div>
+                            <div class="bg-white border border-slate-200 p-3 cell-hover" data-addr="A3"></div>
+                            <div class="bg-white border border-slate-200 p-3 cell-hover" data-addr="B3"></div>
+                            <div class="bg-white border border-slate-200 p-3 cell-hover" data-addr="C3"></div>
+                        </div>
+                    </div>
+
+                    <div class="flex-1 space-y-4">
+                        <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r">
+                            <h3 class="font-bold text-blue-900">Celda Seleccionada:</h3>
+                            <p class="text-3xl font-mono text-blue-600 mt-1" id="cell-display">--</p>
+                            <p class="text-sm text-blue-800 mt-2">
+                                Imagina que cada celda es una <strong>caja</strong> con una etiqueta. Trabajamos con la etiqueta (ej. A1), no solo con lo que hay dentro.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: References Logic -->
+        <section id="referencias" class="scroll-mt-24">
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Theory -->
+                <div class="space-y-4">
+                    <h2 class="text-2xl font-bold text-slate-900">2. El Poder de las Referencias</h2>
+                    <p class="text-slate-600">
+                        La magia ocurre cuando conectas celdas. Si usas referencias, al cambiar un dato, ¡el resultado se actualiza solo!
+                    </p>
+                    <ul class="space-y-3 mt-4">
+                        <li class="flex items-start">
+                            <span class="bg-red-100 text-red-600 p-1 rounded mr-3 text-xs font-bold mt-1">MAL</span>
+                            <span class="text-slate-700 text-sm">= 10 + 5 (Estático. Si cambia el precio, falla.)</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="bg-green-100 text-green-600 p-1 rounded mr-3 text-xs font-bold mt-1">BIEN</span>
+                            <span class="text-slate-700 text-sm">= A1 + A2 (Dinámico. Se adapta al cambio.)</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Interactive Demo -->
+                <div class="bg-slate-900 text-white rounded-2xl p-6 shadow-xl relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4 opacity-10 text-6xl font-serif">fx</div>
+                    <h3 class="font-bold text-lg mb-4 text-green-400">Simulador de Reactividad</h3>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <label class="font-mono text-slate-400">Celda A1 (Ingreso)</label>
+                            <input type="number" id="ref-input-a" value="100" class="w-24 bg-slate-800 border border-slate-700 rounded px-2 py-1 text-right focus:border-green-500 focus:outline-none transition">
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <label class="font-mono text-slate-400">Celda A2 (Gasto)</label>
+                            <input type="number" id="ref-input-b" value="25" class="w-24 bg-slate-800 border border-slate-700 rounded px-2 py-1 text-right focus:border-green-500 focus:outline-none transition">
+                        </div>
+                        
+                        <div class="border-t border-slate-700 pt-4 mt-2">
+                            <div class="flex items-center justify-between">
+                                <span class="font-mono text-sm text-yellow-400">Fórmula: =A1-A2</span>
+                                <span class="text-2xl font-bold" id="ref-result">75</span>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-2 italic">Prueba a cambiar los números de arriba. El resultado cambia instantáneamente.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Essential Functions -->
+        <section id="funciones" class="space-y-6">
+            <h2 class="text-2xl font-bold text-slate-900">3. Funciones Esenciales</h2>
+            <p class="text-slate-600">Recuerda la Regla de Oro: Toda fórmula empieza con <strong>=</strong>.</p>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Function Card 1 -->
+                <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm hover:shadow-md transition group">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="bg-blue-100 text-blue-700 p-2 rounded-lg font-bold group-hover:bg-blue-600 group-hover:text-white transition">∑</span>
+                        <h3 class="font-bold">SUMA</h3>
+                    </div>
+                    <code class="block bg-stone-100 text-xs p-2 rounded mb-2 text-slate-600">=SUMA(A1:A5)</code>
+                    <p class="text-sm text-slate-500">Suma todos los números en el rango seleccionado.</p>
+                </div>
+
+                <!-- Function Card 2 -->
+                <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm hover:shadow-md transition group">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="bg-purple-100 text-purple-700 p-2 rounded-lg font-bold group-hover:bg-purple-600 group-hover:text-white transition">x̄</span>
+                        <h3 class="font-bold">PROMEDIO</h3>
+                    </div>
+                    <code class="block bg-stone-100 text-xs p-2 rounded mb-2 text-slate-600">=PROMEDIO(B1:B10)</code>
+                    <p class="text-sm text-slate-500">Calcula la media aritmética de los valores.</p>
+                </div>
+
+                <!-- Function Card 3 -->
+                <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm hover:shadow-md transition group">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="bg-orange-100 text-orange-700 p-2 rounded-lg font-bold group-hover:bg-orange-600 group-hover:text-white transition">↑↓</span>
+                        <h3 class="font-bold">MAX / MIN</h3>
+                    </div>
+                    <code class="block bg-stone-100 text-xs p-2 rounded mb-2 text-slate-600">=MAX(C1:C20)</code>
+                    <p class="text-sm text-slate-500">Encuentra el valor más alto o más bajo de la lista.</p>
+                </div>
+
+                <!-- Function Card 4 -->
+                <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm hover:shadow-md transition group">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="bg-teal-100 text-teal-700 p-2 rounded-lg font-bold group-hover:bg-teal-600 group-hover:text-white transition">#</span>
+                        <h3 class="font-bold">CONTAR</h3>
+                    </div>
+                    <code class="block bg-stone-100 text-xs p-2 rounded mb-2 text-slate-600">=CONTAR(A1:A50)</code>
+                    <p class="text-sm text-slate-500">Cuenta cuántas celdas contienen números.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4 & 5: Practical Exercise + Chart -->
+        <section id="practica" class="bg-white rounded-3xl shadow-xl border border-stone-200 overflow-hidden">
+            <div class="bg-slate-900 p-6 sm:p-8 text-white flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold flex items-center gap-2">
+                        <span class="text-green-400">⚙️</span> Taller: Gestión de mi Economía
+                    </h2>
+                    <p class="text-slate-400 text-sm mt-1">
+                        Rellena la tabla. Las funciones y el gráfico se actualizarán en tiempo real.
+                    </p>
+                </div>
+                <div class="text-right hidden sm:block">
+                    <span class="text-xs text-slate-500 uppercase tracking-wide">Balance Final</span>
+                    <div id="header-balance" class="text-3xl font-bold text-white">0.00 €</div>
+                </div>
+            </div>
+
+            <div class="grid lg:grid-cols-3 divide-y lg:divide-y-0 lg:divide-x divide-stone-200">
+                
+                <!-- The Spreadsheet Interface -->
+                <div class="lg:col-span-2 p-6 bg-stone-50">
+                    <div class="bg-white border border-stone-300 rounded shadow-sm overflow-hidden">
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-stone-100 text-stone-600 font-bold uppercase text-xs">
+                                <tr>
+                                    <th class="p-3 border-b border-r w-10 text-center">#</th>
+                                    <th class="p-3 border-b border-r">A: Concepto</th>
+                                    <th class="p-3 border-b border-r w-32">B: Tipo</th>
+                                    <th class="p-3 border-b w-32 text-right">C: Importe (€)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="spreadsheet-body" class="divide-y divide-stone-100">
+                                <!-- JS will populate rows -->
+                            </tbody>
+                            <tfoot class="bg-stone-50 font-bold text-slate-700">
+                                <tr class="border-t-2 border-stone-200">
+                                    <td class="p-3 text-center text-xs text-stone-400">fx</td>
+                                    <td colspan="2" class="p-3 text-right">Total Ingresos (=SUMA)</td>
+                                    <td class="p-3 text-right text-emerald-600" id="total-income">0.00 €</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 text-center text-xs text-stone-400">fx</td>
+                                    <td colspan="2" class="p-3 text-right">Gasto Medio (=PROMEDIO)</td>
+                                    <td class="p-3 text-right text-slate-600" id="avg-expense">0.00 €</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 text-center text-xs text-stone-400">fx</td>
+                                    <td colspan="2" class="p-3 text-right">Total Gastos (=SUMA)</td>
+                                    <td class="p-3 text-right text-rose-500" id="total-expense">0.00 €</td>
+                                </tr>
+                                <tr class="bg-slate-100 text-base border-t border-slate-300">
+                                    <td class="p-3 text-center text-xs text-stone-400">fx</td>
+                                    <td colspan="2" class="p-3 text-right">BALANCE FINAL</td>
+                                    <td class="p-3 text-right" id="final-balance">0.00 €</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    <div class="mt-4 flex gap-2">
+                        <button onclick="addRow()" class="text-sm bg-white border border-stone-300 hover:bg-stone-50 text-slate-600 px-3 py-1.5 rounded shadow-sm flex items-center gap-1">
+                            <span>+</span> Añadir Fila
+                        </button>
+                        <button onclick="resetData()" class="text-sm text-red-500 hover:text-red-700 px-3 py-1.5 font-medium ml-auto">
+                            Reiniciar Datos
+                        </button>
+                    </div>
+                </div>
+
+                <!-- The Visualization Panel -->
+                <div class="p-6 bg-white flex flex-col justify-center items-center">
+                    <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-6">Análisis Visual</h3>
+                    
+                    <!-- Chart Container as requested -->
+                    <div class="chart-container">
+                        <canvas id="budgetChart"></canvas>
+                    </div>
+
+                    <div class="mt-8 text-center space-y-2">
+                        <p class="text-xs text-slate-400">Interpretación de Datos</p>
+                        <div id="chart-insight" class="text-sm font-medium text-slate-600 bg-stone-50 p-3 rounded-lg border border-stone-100">
+                            Añade datos para ver el análisis.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-stone-100 border-t border-stone-200 mt-24 py-12">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <p class="text-slate-500 mb-2">Sesión Didáctica: 4º ESO</p>
+            <p class="text-slate-400 text-sm">
+                Diseñado para aprender la lógica detrás de las hojas de cálculo.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // --- Logic Part 1: Grid Interaction ---
+        const cells = document.querySelectorAll('.cell-hover');
+        const display = document.getElementById('cell-display');
+
+        cells.forEach(cell => {
+            cell.addEventListener('mouseenter', () => {
+                const addr = cell.getAttribute('data-addr');
+                display.innerText = addr;
+                cell.innerText = Math.floor(Math.random() * 100); // Random visual data
+                cell.style.backgroundColor = '#e0f2fe';
+            });
+            cell.addEventListener('mouseleave', () => {
+                cell.innerText = '';
+                cell.style.backgroundColor = '';
+                display.innerText = '--';
+            });
+        });
+
+        // --- Logic Part 2: Reference Simulator ---
+        const refA = document.getElementById('ref-input-a');
+        const refB = document.getElementById('ref-input-b');
+        const refRes = document.getElementById('ref-result');
+
+        function updateReferenceDemo() {
+            const valA = parseFloat(refA.value) || 0;
+            const valB = parseFloat(refB.value) || 0;
+            const res = valA - valB;
+            refRes.innerText = res;
+            
+            // Visual feedback for reactivity
+            refRes.style.transform = 'scale(1.2)';
+            refRes.style.color = res >= 0 ? '#4ade80' : '#f87171'; // Green or Red
+            setTimeout(() => {
+                refRes.style.transform = 'scale(1)';
+                refRes.style.color = 'white';
+            }, 200);
+        }
+
+        refA.addEventListener('input', updateReferenceDemo);
+        refB.addEventListener('input', updateReferenceDemo);
+
+        // --- Logic Part 3: The "Economy" Simulator Application ---
+
+        // Initial Data Structure
+        let tableData = [
+            { id: 1, concept: 'Paga Semanal', type: 'ingreso', amount: 20 },
+            { id: 2, concept: 'Cine + Palomitas', type: 'gasto', amount: 15 },
+            { id: 3, concept: 'Regalo Abuela', type: 'ingreso', amount: 50 },
+            { id: 4, concept: 'Merienda', type: 'gasto', amount: 5.50 },
+            { id: 5, concept: 'Ahorro', type: 'gasto', amount: 10 }
+        ];
+
+        let myChart = null;
+
+        function renderTable() {
+            const tbody = document.getElementById('spreadsheet-body');
+            tbody.innerHTML = '';
+
+            tableData.forEach((row, index) => {
+                const tr = document.createElement('tr');
+                tr.className = "group hover:bg-stone-50 transition";
+                
+                // Row Number
+                tr.innerHTML = `
+                    <td class="p-2 border-b border-r text-center text-xs text-stone-400 font-mono">${index + 1}</td>
+                    <td class="p-2 border-b border-r">
+                        <input type="text" value="${row.concept}" 
+                            class="w-full bg-transparent sheet-input px-2 py-1 rounded"
+                            onchange="updateRow(${row.id}, 'concept', this.value)">
+                    </td>
+                    <td class="p-2 border-b border-r">
+                        <select 
+                            class="w-full bg-transparent sheet-input px-2 py-1 rounded text-xs uppercase font-bold ${row.type === 'ingreso' ? 'text-emerald-600' : 'text-rose-500'}"
+                            onchange="updateRow(${row.id}, 'type', this.value)">
+                            <option value="ingreso" ${row.type === 'ingreso' ? 'selected' : ''}>Ingreso</option>
+                            <option value="gasto" ${row.type === 'gasto' ? 'selected' : ''}>Gasto</option>
+                        </select>
+                    </td>
+                    <td class="p-2 border-b">
+                        <input type="number" value="${row.amount}" step="0.50"
+                            class="w-full bg-transparent sheet-input px-2 py-1 rounded text-right font-mono"
+                            oninput="updateRow(${row.id}, 'amount', this.value)">
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            calculateFunctions();
+        }
+
+        function updateRow(id, field, value) {
+            const row = tableData.find(r => r.id === id);
+            if (row) {
+                if (field === 'amount') {
+                    row[field] = parseFloat(value) || 0;
+                } else {
+                    row[field] = value;
+                }
+                calculateFunctions();
+            }
+        }
+
+        function addRow() {
+            const newId = tableData.length > 0 ? Math.max(...tableData.map(d => d.id)) + 1 : 1;
+            tableData.push({ id: newId, concept: 'Nuevo Item', type: 'gasto', amount: 0 });
+            renderTable();
+        }
+
+        function resetData() {
+            tableData = [
+                { id: 1, concept: 'Paga Semanal', type: 'ingreso', amount: 20 },
+                { id: 2, concept: 'Cine + Palomitas', type: 'gasto', amount: 15 },
+                { id: 3, concept: 'Regalo Abuela', type: 'ingreso', amount: 50 },
+                { id: 4, concept: 'Merienda', type: 'gasto', amount: 5.50 }
+            ];
+            renderTable();
+        }
+
+        function formatMoney(amount) {
+            return amount.toFixed(2) + ' €';
+        }
+
+        function calculateFunctions() {
+            // Filter logic
+            const incomes = tableData.filter(r => r.type === 'ingreso');
+            const expenses = tableData.filter(r => r.type === 'gasto');
+
+            // 1. SUMA
+            const totalIncome = incomes.reduce((sum, item) => sum + item.amount, 0);
+            const totalExpense = expenses.reduce((sum, item) => sum + item.amount, 0);
+
+            // 2. PROMEDIO
+            const avgExpense = expenses.length > 0 ? totalExpense / expenses.length : 0;
+
+            // 3. BALANCE (Formula Simple)
+            const balance = totalIncome - totalExpense;
+
+            // Update DOM
+            document.getElementById('total-income').innerText = formatMoney(totalIncome);
+            document.getElementById('total-expense').innerText = formatMoney(totalExpense);
+            document.getElementById('avg-expense').innerText = formatMoney(avgExpense);
+            
+            const balanceEl = document.getElementById('final-balance');
+            const headerBalanceEl = document.getElementById('header-balance');
+            
+            const balanceText = formatMoney(balance);
+            balanceEl.innerText = balanceText;
+            headerBalanceEl.innerText = balanceText;
+
+            // Conditional Formatting
+            if (balance < 0) {
+                balanceEl.classList.add('text-red-600', 'font-bold');
+                balanceEl.classList.remove('text-slate-900');
+                headerBalanceEl.classList.add('text-red-300');
+                headerBalanceEl.classList.remove('text-white');
+            } else {
+                balanceEl.classList.remove('text-red-600', 'font-bold');
+                balanceEl.classList.add('text-slate-900');
+                headerBalanceEl.classList.remove('text-red-300');
+                headerBalanceEl.classList.add('text-white');
+            }
+
+            updateChart(totalIncome, totalExpense);
+            updateInsight(totalIncome, totalExpense, balance);
+        }
+
+        function updateInsight(income, expense, balance) {
+            const el = document.getElementById('chart-insight');
+            if (balance < 0) {
+                el.innerText = "⚠️ ¡Cuidado! Estás gastando más de lo que ingresas.";
+                el.className = "text-sm font-medium text-red-600 bg-red-50 p-3 rounded-lg border border-red-100";
+            } else if (expense > income * 0.8) {
+                el.innerText = "📊 Vas bien, pero tus gastos son altos (más del 80%).";
+                el.className = "text-sm font-medium text-orange-600 bg-orange-50 p-3 rounded-lg border border-orange-100";
+            } else {
+                el.innerText = "✅ ¡Excelente salud financiera! Tienes capacidad de ahorro.";
+                el.className = "text-sm font-medium text-green-600 bg-green-50 p-3 rounded-lg border border-green-100";
+            }
+        }
+
+        // --- Logic Part 4: Chart.js Integration ---
+        function initChart() {
+            const ctx = document.getElementById('budgetChart').getContext('2d');
+            myChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Ingresos', 'Gastos'],
+                    datasets: [{
+                        data: [0, 0],
+                        backgroundColor: ['#10b981', '#f43f5e'], // Emerald-500, Rose-500
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20,
+                                font: { family: "'Inter', sans-serif" }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed !== null) {
+                                        label += new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(context.parsed);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateChart(income, expense) {
+            if (myChart) {
+                myChart.data.datasets[0].data = [income, expense];
+                myChart.update();
+            }
+        }
+
+        function scrollToSection(id) {
+            const el = document.getElementById(id);
+            if(el) {
+                el.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // Initialization
+        window.addEventListener('DOMContentLoaded', () => {
+            initChart();
+            renderTable();
+            // Trigger calculation once to set initials
+            calculateFunctions();
+        });
+
+    </script>
+</body>
+</html>
