@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zoom a mi Vida Digital - Guía Interactiva</title>
+    <script src="/Digitalizacion-4-ESO/assets/tailwind.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .phase-card {
+            transition: all 0.3s ease;
+        }
+        .phase-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .active-tab {
+            border-bottom: 2px solid #0891b2; /* cyan-600 */
+            color: #0891b2;
+            font-weight: 600;
+        }
+        .inactive-tab {
+            color: #6b7280; /* gray-500 */
+        }
+        .inactive-tab:hover {
+            color: #374151; /* gray-700 */
+        }
+    </style>
+    <!-- Chosen Palette: Warm Neutrals & Cyan/Teal Tech Accents -->
+    <!-- Palette Name: "Digital Laboratory Clean" - Backgrounds: Slate-50/White. Text: Slate-800. Accents: Cyan-600, Amber-500 (Warnings), Emerald-500 (Success). -->
+    
+    <!-- Application Structure Plan: 
+         Structure: "Interactive Workshop Dashboard".
+         Rationale: The source report is a sequence of activities (Phases) with specific learning goals. A dashboard approach allows students to visualize the entire project arc while drilling down into specific tasks.
+         Key Sections:
+         1. Dashboard Overview: Summary of goals and the "Why".
+         2. Phase Navigator: A central tabbed interface to guide students through the 4 distinct phases (Setup, Forensics, Identity, Cloud). This prevents information overload.
+         3. Competency Tracker: A visualization of the skills being assessed, linking activities to curriculum criteria.
+         User Flow: User starts at Overview -> Explores specific Phases to see tasks -> Checks Evaluation criteria to ensure they are meeting goals.
+    -->
+
+    <!-- Visualization & Content Choices:
+         1. Phase 2 (Forensics) -> Goal: Inform/Debate -> Viz: Bar Chart "Hypothetical Contamination Levels" -> Interaction: Hover for health details. -> Justification: Visualizes the "invisible" dirt mentioned in the report to spark the health debate.
+         2. Competencies -> Goal: Inform/Relate -> Viz: Radar Chart -> Interaction: None/Static -> Justification: Shows the multi-dimensional nature of the learning (Technical, Ethical, Social).
+         3. Phase 1 (Setup) -> Goal: Guide -> Viz: Interactive Checklist & Troubleshooting Accordion -> Interaction: Click to check/expand -> Justification: Directly translates the "Troubleshooting" instructions into a functional tool.
+         4. Content Integration -> Text is broken down into "Mission Cards" to keep it digestible for adolescents.
+         CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <span class="text-2xl">🔬</span>
+                <h1 class="text-xl font-bold text-slate-800 tracking-tight">Zoom a mi Vida Digital <span class="text-sm font-normal text-slate-500 hidden sm:inline-block">| Taller de Digitalización 4º ESO</span></h1>
+            </div>
+            <nav class="flex space-x-4">
+                <button onclick="switchView('overview')" id="nav-overview" class="text-sm font-medium transition-colors">Inicio</button>
+                <button onclick="switchView('phases')" id="nav-phases" class="text-sm font-medium transition-colors">Actividades</button>
+                <button onclick="switchView('evaluation')" id="nav-evaluation" class="text-sm font-medium transition-colors">Evaluación</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- VIEW: OVERVIEW -->
+        <section id="view-overview" class="space-y-8 animate-fade-in">
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <h2 class="text-3xl font-bold text-slate-900 mb-4">Explora tu identidad a nivel microscópico</h2>
+                <p class="text-lg text-slate-600 leading-relaxed">
+                    Bienvenido al proyecto. Usaremos microscopios digitales para analizar objetos cotidianos, entender el hardware y reflexionar sobre nuestra huella digital. Este panel te guiará a través de las 4 fases de la investigación.
+                </p>
+            </div>
+
+            <!-- Objectives Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Obj 1 -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:border-cyan-200 transition-colors">
+                    <div class="w-12 h-12 bg-cyan-100 rounded-lg flex items-center justify-center mb-4 text-2xl">⚙️</div>
+                    <h3 class="font-semibold text-lg mb-2">Hardware</h3>
+                    <p class="text-sm text-slate-600">Configurar dispositivos, instalar drivers y solucionar problemas de conexión.</p>
+                </div>
+                <!-- Obj 2 -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:border-amber-200 transition-colors">
+                    <div class="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center mb-4 text-2xl">🦠</div>
+                    <h3 class="font-semibold text-lg mb-2">Salud Digital</h3>
+                    <p class="text-sm text-slate-600">Analizar suciedad invisible y entender el impacto en la salud y mantenimiento.</p>
+                </div>
+                <!-- Obj 3 -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:border-purple-200 transition-colors">
+                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4 text-2xl">☁️</div>
+                    <h3 class="font-semibold text-lg mb-2">Gestión Nube</h3>
+                    <p class="text-sm text-slate-600">Organizar archivos en Drive y aplicar licencias de uso a tus creaciones.</p>
+                </div>
+                <!-- Obj 4 -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:border-emerald-200 transition-colors">
+                    <div class="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center mb-4 text-2xl">🛡️</div>
+                    <h3 class="font-semibold text-lg mb-2">Privacidad</h3>
+                    <p class="text-sm text-slate-600">Reflexionar sobre la biometría y tu huella digital (literal y virtual).</p>
+                </div>
+            </div>
+
+            <!-- Call to Action -->
+            <div class="mt-12 text-center">
+                <button onclick="switchView('phases')" class="bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transform transition hover:scale-105">
+                    Comenzar la Misión
+                </button>
+            </div>
+        </section>
+
+        <!-- VIEW: PHASES (Interactive Workflow) -->
+        <section id="view-phases" class="hidden space-y-6">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <!-- Phase Navigation -->
+                <div class="flex overflow-x-auto bg-slate-50 border-b border-slate-200">
+                    <button onclick="setPhase(1)" id="tab-phase-1" class="phase-tab flex-1 min-w-[150px] py-4 px-6 text-sm font-medium text-center hover:bg-white transition-colors">Fase 1: Configuración</button>
+                    <button onclick="setPhase(2)" id="tab-phase-2" class="phase-tab flex-1 min-w-[150px] py-4 px-6 text-sm font-medium text-center hover:bg-white transition-colors">Fase 2: Lab Forense</button>
+                    <button onclick="setPhase(3)" id="tab-phase-3" class="phase-tab flex-1 min-w-[150px] py-4 px-6 text-sm font-medium text-center hover:bg-white transition-colors">Fase 3: Identidad</button>
+                    <button onclick="setPhase(4)" id="tab-phase-4" class="phase-tab flex-1 min-w-[150px] py-4 px-6 text-sm font-medium text-center hover:bg-white transition-colors">Fase 4: La Nube</button>
+                </div>
+
+                <!-- Phase Content Containers -->
+                <div class="p-6 sm:p-10 min-h-[500px]">
+                    
+                    <!-- Content Phase 1 -->
+                    <div id="content-phase-1" class="phase-content hidden space-y-6">
+                        <div class="border-l-4 border-cyan-500 pl-4 mb-6">
+                            <h2 class="text-2xl font-bold text-slate-800">Desboxeo e Instalación</h2>
+                            <p class="text-slate-600 mt-1">Tu primera misión es convertir el hardware inerte en una herramienta científica funcional.</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <!-- Left: Checklist -->
+                            <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
+                                <h3 class="font-bold text-lg mb-4 flex items-center">📝 Lista de Verificación</h3>
+                                <div class="space-y-3">
+                                    <label class="flex items-center space-x-3 cursor-pointer">
+                                        <input type="checkbox" class="form-checkbox h-5 w-5 text-cyan-600 rounded focus:ring-cyan-500">
+                                        <span>Identificar interfaz (USB-A, C o Wi-Fi)</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 cursor-pointer">
+                                        <input type="checkbox" class="form-checkbox h-5 w-5 text-cyan-600 rounded focus:ring-cyan-500">
+                                        <span>Descargar software oficial (Web fabricante)</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 cursor-pointer">
+                                        <input type="checkbox" class="form-checkbox h-5 w-5 text-cyan-600 rounded focus:ring-cyan-500">
+                                        <span>Instalar drivers y dar permisos de Cámara</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 cursor-pointer">
+                                        <input type="checkbox" class="form-checkbox h-5 w-5 text-cyan-600 rounded focus:ring-cyan-500">
+                                        <span>Primera imagen enfocada en pantalla</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Right: Troubleshooting -->
+                            <div>
+                                <h3 class="font-bold text-lg mb-4 flex items-center text-amber-600">⚠️ Solución de Problemas (Troubleshooting)</h3>
+                                <p class="text-sm text-slate-500 mb-4">Si el dispositivo no funciona, sigue este protocolo antes de llamar al profesor.</p>
+                                <div class="space-y-2">
+                                    <details class="bg-white border border-slate-200 rounded-lg">
+                                        <summary class="px-4 py-3 font-medium cursor-pointer hover:bg-slate-50">El ordenador no reconoce el USB</summary>
+                                        <div class="px-4 py-3 text-sm text-slate-600 border-t border-slate-100 bg-slate-50">
+                                            1. Prueba otro puerto USB.<br>
+                                            2. Verifica el Administrador de Dispositivos.<br>
+                                            3. ¿El cable es solo de carga o también de datos?
+                                        </div>
+                                    </details>
+                                    <details class="bg-white border border-slate-200 rounded-lg">
+                                        <summary class="px-4 py-3 font-medium cursor-pointer hover:bg-slate-50">Pantalla negra en la aplicación</summary>
+                                        <div class="px-4 py-3 text-sm text-slate-600 border-t border-slate-100 bg-slate-50">
+                                            1. Revisa si la tapa de la lente está puesta.<br>
+                                            2. Comprueba los permisos de privacidad de la cámara en Windows/MacOS.<br>
+                                            3. Asegúrate de que no hay otra app usando la cámara.
+                                        </div>
+                                    </details>
+                                    <details class="bg-white border border-slate-200 rounded-lg">
+                                        <summary class="px-4 py-3 font-medium cursor-pointer hover:bg-slate-50">Imagen borrosa</summary>
+                                        <div class="px-4 py-3 text-sm text-slate-600 border-t border-slate-100 bg-slate-50">
+                                            1. Ajusta la rueda de enfoque manual en el cuerpo del microscopio.<br>
+                                            2. Limpia la lente con un paño de microfibra.<br>
+                                            3. Ajusta la iluminación LED.
+                                        </div>
+                                    </details>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Content Phase 2 -->
+                    <div id="content-phase-2" class="phase-content hidden space-y-6">
+                        <div class="border-l-4 border-amber-500 pl-4 mb-6">
+                            <h2 class="text-2xl font-bold text-slate-800">Laboratorio Forense Digital</h2>
+                            <p class="text-slate-600 mt-1">Descubre la "cara oculta" de tus dispositivos. ¿Qué vive en tu teclado?</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                            <div class="lg:col-span-2">
+                                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                                    <h4 class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-4">Análisis Comparativo de Suciedad (Simulación)</h4>
+                                    <!-- Chart Container for Forensics -->
+                                    <div class="chart-container">
+                                        <canvas id="dirtChart"></canvas>
+                                    </div>
+                                    <p class="text-xs text-center text-slate-400 mt-2">Valores estimados de Unidades Formadoras de Colonias (UFC) y acumulación de partículas.</p>
+                                </div>
+                            </div>
+                            <div class="space-y-4">
+                                <div class="bg-amber-50 p-5 rounded-xl border border-amber-100">
+                                    <h3 class="font-bold text-amber-800 mb-2">Debate de Salud</h3>
+                                    <p class="text-sm text-amber-700 mb-3">La acumulación de piel muerta y grasa es el caldo de cultivo perfecto para bacterias. Tocamos estas superficies y luego nuestra cara.</p>
+                                    <button onclick="toggleDetails('cleaning-tips')" class="text-xs bg-amber-200 hover:bg-amber-300 text-amber-900 px-3 py-1 rounded font-semibold transition-colors">Ver Tips de Limpieza</button>
+                                </div>
+                                <div id="cleaning-tips" class="hidden bg-white p-5 rounded-xl border border-slate-200 shadow-sm animate-fade-in">
+                                    <h4 class="font-bold text-sm mb-2">Protocolo de Limpieza:</h4>
+                                    <ul class="text-sm text-slate-600 list-disc list-inside space-y-1">
+                                        <li>Apagar el dispositivo.</li>
+                                        <li>Usar aire comprimido para ranuras.</li>
+                                        <li>Paño de microfibra con alcohol isopropílico.</li>
+                                        <li>¡Nunca rociar líquidos directamente!</li>
+                                    </ul>
+                                </div>
+                                <div class="bg-blue-50 p-5 rounded-xl border border-blue-100">
+                                    <h3 class="font-bold text-blue-800 mb-2">Impacto Sostenible</h3>
+                                    <p class="text-sm text-blue-700">El polvo en ventiladores y puertos causa sobrecalentamiento. Limpiar tus equipos alarga su vida útil y reduce la basura electrónica.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Content Phase 3 -->
+                    <div id="content-phase-3" class="phase-content hidden space-y-6">
+                        <div class="border-l-4 border-purple-500 pl-4 mb-6">
+                            <h2 class="text-2xl font-bold text-slate-800">Captura de Identidad</h2>
+                            <p class="text-slate-600 mt-1">Crea evidencias digitales de tu entorno. Busca estos 3 objetivos.</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <!-- Target 1 -->
+                            <div class="group bg-white p-6 rounded-xl border border-slate-200 hover:shadow-md transition-all text-center">
+                                <div class="text-4xl mb-4">📱</div>
+                                <h3 class="font-bold text-lg mb-2">La Pantalla (RGB)</h3>
+                                <p class="text-sm text-slate-500 mb-4">Zoom máximo a tu móvil.</p>
+                                <div class="bg-slate-50 p-3 rounded text-left text-xs text-slate-600 group-hover:bg-purple-50 transition-colors">
+                                    <strong>Objetivo:</strong> Ver los sub-píxeles Rojo, Verde y Azul. Entender cómo se forma la imagen digital que consumes a diario.
+                                </div>
+                            </div>
+
+                            <!-- Target 2 -->
+                            <div class="group bg-white p-6 rounded-xl border border-slate-200 hover:shadow-md transition-all text-center">
+                                <div class="text-4xl mb-4">👆</div>
+                                <h3 class="font-bold text-lg mb-2">Huella Dactilar</h3>
+                                <p class="text-sm text-slate-500 mb-4">Analiza tus crestas papilares.</p>
+                                <div class="bg-slate-50 p-3 rounded text-left text-xs text-slate-600 group-hover:bg-purple-50 transition-colors">
+                                    <strong>Reflexión:</strong> Biometría. Si tu huella es tu contraseña, ¿es seguro tener una foto de alta resolución de ella en internet?
+                                </div>
+                            </div>
+
+                            <!-- Target 3 -->
+                            <div class="group bg-white p-6 rounded-xl border border-slate-200 hover:shadow-md transition-all text-center">
+                                <div class="text-4xl mb-4">👕</div>
+                                <h3 class="font-bold text-lg mb-2">Fibras Textiles</h3>
+                                <p class="text-sm text-slate-500 mb-4">Ropa de marca vs. básica.</p>
+                                <div class="bg-slate-50 p-3 rounded text-left text-xs text-slate-600 group-hover:bg-purple-50 transition-colors">
+                                    <strong>Contexto:</strong> Fast Fashion. Analiza la calidad de los materiales y reflexiona sobre el consumo y la sostenibilidad textil.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Content Phase 4 -->
+                    <div id="content-phase-4" class="phase-content hidden space-y-6">
+                        <div class="border-l-4 border-emerald-500 pl-4 mb-6">
+                            <h2 class="text-2xl font-bold text-slate-800">Gestión en la Nube</h2>
+                            <p class="text-slate-600 mt-1">Organiza y etiqueta tu trabajo. Un buen profesional digital es ordenado.</p>
+                        </div>
+
+                        <div class="bg-white rounded-xl border border-slate-200 p-8">
+                            <h3 class="text-lg font-bold mb-6 text-center">Flujo de Trabajo Digital</h3>
+                            
+                            <div class="flex flex-col md:flex-row justify-between items-center space-y-6 md:space-y-0 relative">
+                                <!-- Step 1 -->
+                                <div class="w-full md:w-1/3 flex flex-col items-center z-10">
+                                    <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center text-2xl border-2 border-slate-300">📂</div>
+                                    <h4 class="font-bold mt-4">1. Estructura</h4>
+                                    <p class="text-xs text-center text-slate-500 mt-2 px-4">Crea carpeta en Drive:<br><code class="bg-slate-100 px-1 rounded">PROYECTO_GRUPO_A</code></p>
+                                </div>
+
+                                <!-- Connector Lines (Visual) -->
+                                <div class="hidden md:block absolute top-8 left-0 w-full h-1 bg-slate-100 -z-0"></div>
+
+                                <!-- Step 2 -->
+                                <div class="w-full md:w-1/3 flex flex-col items-center z-10">
+                                    <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center text-2xl border-2 border-slate-300">🏷️</div>
+                                    <h4 class="font-bold mt-4">2. Curación</h4>
+                                    <p class="text-xs text-center text-slate-500 mt-2 px-4">Selecciona las 3 mejores fotos. Renómbralas descriptivamente.</p>
+                                </div>
+
+                                <!-- Step 3 -->
+                                <div class="w-full md:w-1/3 flex flex-col items-center z-10">
+                                    <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center text-2xl border-2 border-slate-300">©️</div>
+                                    <h4 class="font-bold mt-4">3. Licenciamiento</h4>
+                                    <p class="text-xs text-center text-slate-500 mt-2 px-4">Añade documento txt con autoría y licencia Creative Commons.</p>
+                                </div>
+                            </div>
+
+                            <div class="mt-12 p-4 bg-emerald-50 rounded-lg border border-emerald-100 text-center">
+                                <p class="text-emerald-800 text-sm font-medium">Recuerda compartir la carpeta con el profesor con permisos de "Comentarista" o "Editor".</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: EVALUATION -->
+        <section id="view-evaluation" class="hidden space-y-8">
+            <div class="max-w-4xl mx-auto">
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl font-bold text-slate-900 mb-4">Matriz de Competencias</h2>
+                    <p class="text-slate-600">Cómo se evalúa tu trabajo en este proyecto según los criterios DIG.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                    <!-- Chart Container for Skills -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                        <div class="chart-container">
+                            <canvas id="skillsChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Criteria List -->
+                    <div class="space-y-4">
+                        <div class="bg-white p-4 rounded-lg border-l-4 border-cyan-500 shadow-sm">
+                            <h4 class="font-bold text-slate-800">Sostenibilidad (DIG.4.1.3)</h4>
+                            <p class="text-sm text-slate-600 mt-1">Identificar fallos de hardware y entender que la limpieza previene la reposición prematura.</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg border-l-4 border-purple-500 shadow-sm">
+                            <h4 class="font-bold text-slate-800">Colaboración (DIG.4.2.4)</h4>
+                            <p class="text-sm text-slate-600 mt-1">Compartir imágenes en Drive siguiendo normas de etiqueta y estructura.</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg border-l-4 border-emerald-500 shadow-sm">
+                            <h4 class="font-bold text-slate-800">Privacidad (DIG.4.3.1)</h4>
+                            <p class="text-sm text-slate-600 mt-1">Comprender el valor de la huella física y digital como dato personal crítico.</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg border-l-4 border-amber-500 shadow-sm">
+                            <h4 class="font-bold text-slate-800">Hábitos Saludables (DIG.4.3.3)</h4>
+                            <p class="text-sm text-slate-600 mt-1">Evaluar la higiene de dispositivos y tomar medidas correctivas.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Final Task Box -->
+                <div class="mt-12 bg-slate-800 text-white p-8 rounded-2xl shadow-lg text-center">
+                    <h3 class="text-xl font-bold mb-4">🚀 Tarea Final: El Informe "Micro-Mundo"</h3>
+                    <p class="text-slate-300 max-w-2xl mx-auto mb-6">
+                        Crea una presentación en Google Slides con tus capturas (antes/después de limpieza), explicación técnica de la configuración y tu reflexión sobre la ética y sostenibilidad.
+                    </p>
+                    <div class="inline-block bg-slate-700 px-4 py-2 rounded-lg text-sm font-mono text-cyan-400 border border-slate-600">
+                        Entrega en carpeta compartida de Drive
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 mt-auto py-8">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-slate-500 text-sm">Proyecto Educativo Digitalización 4º ESO</p>
+            <p class="text-slate-400 text-xs mt-2">Basado en el informe: Zoom a mi Vida Digital</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // State Management
+        let currentView = 'overview';
+        let currentPhase = 1;
+
+        // Navigation Logic
+        function switchView(viewId) {
+            // Hide all views
+            document.getElementById('view-overview').classList.add('hidden');
+            document.getElementById('view-phases').classList.add('hidden');
+            document.getElementById('view-evaluation').classList.add('hidden');
+
+            // Reset Nav Styles
+            ['overview', 'phases', 'evaluation'].forEach(id => {
+                const btn = document.getElementById(`nav-${id}`);
+                btn.classList.remove('text-cyan-600', 'font-bold');
+                btn.classList.add('text-slate-500');
+            });
+
+            // Show selected view
+            document.getElementById(`view-${viewId}`).classList.remove('hidden');
+            
+            // Set Active Nav Style
+            const activeBtn = document.getElementById(`nav-${viewId}`);
+            activeBtn.classList.remove('text-slate-500');
+            activeBtn.classList.add('text-cyan-600', 'font-bold');
+
+            // Trigger animations or chart resizing if needed
+            currentView = viewId;
+        }
+
+        function setPhase(phaseNum) {
+            // Hide all phase contents
+            for(let i=1; i<=4; i++) {
+                document.getElementById(`content-phase-${i}`).classList.add('hidden');
+                
+                const tab = document.getElementById(`tab-phase-${i}`);
+                tab.classList.remove('active-tab', 'bg-white');
+                tab.classList.add('inactive-tab');
+            }
+
+            // Show current phase content
+            document.getElementById(`content-phase-${phaseNum}`).classList.remove('hidden');
+            
+            // Set active tab style
+            const activeTab = document.getElementById(`tab-phase-${phaseNum}`);
+            activeTab.classList.remove('inactive-tab');
+            activeTab.classList.add('active-tab', 'bg-white');
+            
+            currentPhase = phaseNum;
+        }
+
+        function toggleDetails(id) {
+            const el = document.getElementById(id);
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+            } else {
+                el.classList.add('hidden');
+            }
+        }
+
+        // Initialize Charts
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set initial state
+            switchView('overview');
+            setPhase(1);
+
+            // Chart Global Defaults
+            Chart.defaults.font.family = "'Inter', sans-serif";
+            Chart.defaults.color = '#64748b';
+
+            // 1. Dirt Chart (Bar Chart for Phase 2)
+            const dirtCtx = document.getElementById('dirtChart').getContext('2d');
+            new Chart(dirtCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Pantalla Móvil', 'Teclado Escolar', 'Auriculares', 'Ratón PC'],
+                    datasets: [{
+                        label: 'Nivel de Suciedad (Escala Relativa)',
+                        data: [75, 90, 60, 85],
+                        backgroundColor: [
+                            'rgba(245, 158, 11, 0.7)', // Amber
+                            'rgba(239, 68, 68, 0.7)',  // Red
+                            'rgba(59, 130, 246, 0.7)', // Blue
+                            'rgba(16, 185, 129, 0.7)'  // Emerald
+                        ],
+                        borderColor: [
+                            'rgb(245, 158, 11)',
+                            'rgb(239, 68, 68)',
+                            'rgb(59, 130, 246)',
+                            'rgb(16, 185, 129)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.raw + '/100 - Riesgo de bacterias';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: { display: true, text: 'Acumulación de Residuos' }
+                        }
+                    }
+                }
+            });
+
+            // 2. Skills Chart (Radar Chart for Evaluation)
+            const skillsCtx = document.getElementById('skillsChart').getContext('2d');
+            new Chart(skillsCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['Sostenibilidad (Hardware)', 'Colaboración (Nube)', 'Privacidad (Huella)', 'Hábitos (Salud)', 'Técnica (Setup)'],
+                    datasets: [{
+                        label: 'Impacto en Competencias DIG',
+                        data: [85, 70, 90, 75, 80],
+                        fill: true,
+                        backgroundColor: 'rgba(8, 145, 178, 0.2)', // Cyan
+                        borderColor: 'rgb(8, 145, 178)',
+                        pointBackgroundColor: 'rgb(8, 145, 178)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgb(8, 145, 178)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    elements: {
+                        line: { borderWidth: 3 }
+                    },
+                    scales: {
+                        r: {
+                            angleLines: { color: '#e2e8f0' },
+                            grid: { color: '#e2e8f0' },
+                            pointLabels: {
+                                font: { size: 11, weight: 'bold' },
+                                color: '#334155'
+                            },
+                            suggestedMin: 0,
+                            suggestedMax: 100
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
